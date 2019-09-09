@@ -69,7 +69,7 @@ SEG_FOLDER="${PASCAL_ROOT}/SegmentationClass"
 SEMANTIC_SEG_FOLDER="${PASCAL_ROOT}/SegmentationClassRaw"
 
 echo "Removing the color map in ground truth annotations..."
-python ./remove_gt_colormap.py \
+python3 ./remove_gt_colormap.py \
   --original_gt_folder="${SEG_FOLDER}" \
   --output_dir="${SEMANTIC_SEG_FOLDER}"
 
@@ -82,7 +82,7 @@ IMAGE_FOLDER="${PASCAL_ROOT}/JPEGImages"
 LIST_FOLDER="${PASCAL_ROOT}/ImageSets/Segmentation"
 
 echo "Converting PASCAL VOC 2012 dataset..."
-python ./build_voc2012_data.py \
+python3 ./build_voc2012_data.py \
   --image_folder="${IMAGE_FOLDER}" \
   --semantic_segmentation_folder="${SEMANTIC_SEG_FOLDER}" \
   --list_folder="${LIST_FOLDER}" \
