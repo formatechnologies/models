@@ -33,6 +33,7 @@ _ADE20K = 'ade20k'
 _CITYSCAPES = 'cityscapes'
 _MAPILLARY_VISTAS = 'mapillary_vistas'
 _PASCAL = 'pascal'
+_FORMA = 'forma'
 
 # Max number of entries in the colormap for each dataset.
 _DATASET_MAX_ENTRIES = {
@@ -40,6 +41,7 @@ _DATASET_MAX_ENTRIES = {
     _CITYSCAPES: 256,
     _MAPILLARY_VISTAS: 66,
     _PASCAL: 256,
+    _FORMA: 256,
 }
 
 
@@ -325,6 +327,18 @@ def create_pascal_label_colormap():
 
   return colormap
 
+def create_forma_label_colormap():
+  return np.asarray([
+      [0, 0, 0],        # seg_background
+      [255, 0, 0],      # seg_body
+      [0, 255, 0],      # seg_garment
+      [0, 0, 255],      # seg_skin
+      [255, 255, 0],    # seg_hair
+      [255, 0, 255],    # seg_arms
+      [0, 255, 255],    # seg_shoe
+      [255, 255, 255],  # seg_sleeves
+      [128, 128, 128],  # seg_pants
+      ])
 
 def get_ade20k_name():
   return _ADE20K
@@ -341,6 +355,8 @@ def get_mapillary_vistas_name():
 def get_pascal_name():
   return _PASCAL
 
+def get_forma_name():
+  return _FORMA
 
 def bit_get(val, idx):
   """Gets the bit value.
@@ -375,6 +391,8 @@ def create_label_colormap(dataset=_PASCAL):
     return create_mapillary_vistas_label_colormap()
   elif dataset == _PASCAL:
     return create_pascal_label_colormap()
+  elif dataset == _FORMA:
+    return create_forma_label_colormap()
   else:
     raise ValueError('Unsupported dataset.')
 

@@ -125,7 +125,8 @@ python3 "${WORK_DIR}"/vis.py \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --vis_logdir="${VIS_LOGDIR}" \
   --dataset_dir="${PASCAL_DATASET}" \
-  --max_number_of_iterations=1
+  --max_number_of_iterations=1 \
+  --colormap_type="forma"
 
 # Export the trained checkpoint.
 CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"

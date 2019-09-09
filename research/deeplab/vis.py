@@ -80,7 +80,7 @@ flags.DEFINE_string('vis_split', 'val',
 
 flags.DEFINE_string('dataset_dir', None, 'Where the dataset reside.')
 
-flags.DEFINE_enum('colormap_type', 'pascal', ['pascal', 'cityscapes'],
+flags.DEFINE_enum('colormap_type', 'pascal', ['pascal', 'cityscapes', 'forma'],
                   'Visualization colormap type.')
 
 flags.DEFINE_boolean('also_save_raw_predictions', False,
