@@ -32,12 +32,15 @@ cd ..
 # Update PYTHONPATH.
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 
+# Fix cuDNN bug with RTX GPUS
+export TF_FORCE_GPU_ALLOW_GROWTH=true
+
 # Set up the working environment.
 CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
 
 # Run model_test first to make sure the PYTHONPATH is correctly set.
-python "${WORK_DIR}"/model_test.py -v
+python3 "${WORK_DIR}"/model_test.py -v
 
 # Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
 DATASET_DIR="datasets"
@@ -73,7 +76,7 @@ PASCAL_DATASET="${WORK_DIR}/${DATASET_DIR}/${PASCAL_FOLDER}/tfrecord"
 
 # Train 10 iterations.
 NUM_ITERATIONS=10
-python "${WORK_DIR}"/train.py \
+python3 "${WORK_DIR}"/train.py \
   --logtostderr \
   --train_split="trainval" \
   --model_variant="xception_65" \
@@ -83,7 +86,7 @@ python "${WORK_DIR}"/train.py \
   --output_stride=16 \
   --decoder_output_stride=4 \
   --train_crop_size="513,513" \
-  --train_batch_size=4 \
+  --train_batch_size=1 \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=true \
   --tf_initial_checkpoint="${INIT_FOLDER}/deeplabv3_pascal_train_aug/model.ckpt" \
@@ -93,7 +96,7 @@ python "${WORK_DIR}"/train.py \
 # Run evaluation. This performs eval over the full val split (1449 images) and
 # will take a while.
 # Using the provided checkpoint, one should expect mIOU=82.20%.
-python "${WORK_DIR}"/eval.py \
+python3 "${WORK_DIR}"/eval.py \
   --logtostderr \
   --eval_split="val" \
   --model_variant="xception_65" \
@@ -109,7 +112,7 @@ python "${WORK_DIR}"/eval.py \
   --max_number_of_evaluations=1
 
 # Visualize the results.
-python "${WORK_DIR}"/vis.py \
+python3 "${WORK_DIR}"/vis.py \
   --logtostderr \
   --vis_split="val" \
   --model_variant="xception_65" \
@@ -128,7 +131,7 @@ python "${WORK_DIR}"/vis.py \
 CKPT_PATH="${TRAIN_LOGDIR}/model.ckpt-${NUM_ITERATIONS}"
 EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 
-python "${WORK_DIR}"/export_model.py \
+python3 "${WORK_DIR}"/export_model.py \
   --logtostderr \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \
