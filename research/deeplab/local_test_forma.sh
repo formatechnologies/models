@@ -23,64 +23,6 @@
 #
 #
 
-# ========================== DATASETS (START) ==========================
-
-# DATASET_NAME="forma_1k"
-# DATASET_SIZE=1000
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
-# NUM_CLASSES=9
-# EVAL_CROP_SIZE="1601,3313"
-# NUM_ITERATIONS=30000
-# SAVE_INTERVAL_SECS=120
-# SAVE_SUMMARIES_SECS=120
-
-# DATASET_NAME="forma_1k_3"
-# DATASET_SIZE=1000
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
-# NUM_CLASSES=3
-# EVAL_CROP_SIZE="1601,3313"
-# NUM_ITERATIONS=30000
-# SAVE_INTERVAL_SECS=120
-# SAVE_SUMMARIES_SECS=120
-
-# DATASET_NAME="forma_1k_7"
-# DATASET_SIZE=1000
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
-# NUM_CLASSES=7
-# EVAL_CROP_SIZE="1601,3313"
-# NUM_ITERATIONS=30000
-# SAVE_INTERVAL_SECS=120
-# SAVE_SUMMARIES_SECS=120
-
-DATASET_NAME="forma_37k"
-DATASET_SIZE=-1
-DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
-NUM_CLASSES=9
-EVAL_CROP_SIZE="1601,3783"
-NUM_ITERATIONS=740000
-SAVE_INTERVAL_SECS=1200
-SAVE_SUMMARIES_SECS=600
-
-# DATASET_NAME="forma_37k_3"
-# DATASET_SIZE=-1
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
-# NUM_CLASSES=3
-# EVAL_CROP_SIZE="1601,3783"
-# NUM_ITERATIONS=740000
-# SAVE_INTERVAL_SECS=1200
-# SAVE_SUMMARIES_SECS=600
-
-# DATASET_NAME="forma_37k_7"
-# DATASET_SIZE=-1
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
-# NUM_CLASSES=7
-# EVAL_CROP_SIZE="1601,3783"
-# NUM_ITERATIONS=740000
-# SAVE_INTERVAL_SECS=1200
-# SAVE_SUMMARIES_SECS=600
-
-# ========================== DATASETS (END) ==========================
-
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
@@ -98,19 +40,81 @@ CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
 DATASET_DIR="datasets"
 
+# ========================== SETTINGS (START) ==========================
+# http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
+
+# DATASET_NAME="forma_1k"
+# DATASET_SIZE=1000
+# DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
+# NUM_CLASSES=9
+# EVAL_CROP_SIZE="1601,3313"
+
+# DATASET_NAME="forma_1k_3"
+# DATASET_SIZE=1000
+# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
+# NUM_CLASSES=3
+# EVAL_CROP_SIZE="1601,3313"
+
+# DATASET_NAME="forma_1k_7"
+# DATASET_SIZE=1000
+# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
+# NUM_CLASSES=7
+# EVAL_CROP_SIZE="1601,3313"
+
+DATASET_NAME="forma_37k"
+DATASET_SIZE=-1
+DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
+NUM_CLASSES=9
+EVAL_CROP_SIZE="1601,3783"
+
+# DATASET_NAME="forma_37k_3"
+# DATASET_SIZE=-1
+# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
+# NUM_CLASSES=3
+# EVAL_CROP_SIZE="1601,3783"
+
+# DATASET_NAME="forma_37k_7"
+# DATASET_SIZE=-1
+# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
+# NUM_CLASSES=7
+# EVAL_CROP_SIZE="1601,3783"
+
+DATASET_FOLDER="${WORK_DIR}/${DATASET_DIR}"
+# DATASET_FOLDER="${HOME}/storage/shared/datasets/deeplab_experiments"
+FORMA_DATASET_DIR="${DATASET_FOLDER}/${DATASET_NAME}"
+mkdir -p "${FORMA_DATASET_DIR}"
+
+# NUM_ITERATIONS=30000
+# SAVE_INTERVAL_SECS=120
+# SAVE_SUMMARIES_SECS=120
+
+NUM_ITERATIONS=740000
+SAVE_INTERVAL_SECS=1200
+SAVE_SUMMARIES_SECS=600
+
+TRAIN_BATCH_SIZE=1
+FINE_TUNE_BATCH_NORM=false
+
+# TRAIN_BATCH_SIZE=12
+# FINE_TUNE_BATCH_NORM=true
+
+TF_INITIAL_CHECKPOINT="${DATASET_FOLDER}/forma_37k_ckpt/model.ckpt-234452"
+INITIALIZE_LAST_LAYERS=true
+LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
+
+# TF_INITIAL_CHECKPOINT="${WORK_DIR}/${DATASET_DIR}/pascal_voc_seg/init_models/deeplabv3_pascal_train_aug/model.ckpt"
+# INITIALIZE_LAST_LAYERS=false
+# LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
+
+# ========================== SETTINGS (END) ==========================
+
 # # Run model_test first to make sure the PYTHONPATH is correctly set.
 # python3 "${WORK_DIR}"/model_test.py -v
 
-# # Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
-# cd "${WORK_DIR}/${DATASET_DIR}"
+# Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
+cd "${WORK_DIR}/${DATASET_DIR}"
 # sh download_and_convert_voc2012.sh
 
-# # Go back to original directory.
-# cd "${CURRENT_DIR}"
-
-# DATASET_FOLDER = "${WORK_DIR}/${DATASET_DIR}"
-DATASET_FOLDER = "${HOME}/shared/datasets/deeplab_experiments"
-FORMA_DATASET_DIR="${DATASET_FOLDER}/${DATASET_NAME}"
 FORMA_DATASET_DATA="${FORMA_DATASET_DIR}/tfrecord"
 FORMA_DATASET_LIST="${FORMA_DATASET_DIR}/dataset_split"
 mkdir -p "${FORMA_DATASET_DATA}"
@@ -120,6 +124,9 @@ python3 ./build_forma_data.py \
     --dataset_seg_encoding_type="${DATASET_SEG_ENCODING_TYPE}" \
     --output_dir="${FORMA_DATASET_DATA}" \
     --list_folder="${FORMA_DATASET_LIST}"
+
+# Go back to original directory.
+cd "${CURRENT_DIR}"
 
 # Set up the working directories.
 EXP_FOLDER="exp/train_on_train_set"
@@ -153,12 +160,12 @@ python3 "${WORK_DIR}"/train.py \
   --output_stride=16 \
   --decoder_output_stride=4 \
   --train_crop_size="513,513" \
-  --train_batch_size=1 \
+  --train_batch_size=${TRAIN_BATCH_SIZE} \
   --training_number_of_steps="${NUM_ITERATIONS}" \
-  --fine_tune_batch_norm=false \
-  --tf_initial_checkpoint="${WORK_DIR}/${DATASET_DIR}/pascal_voc_seg/init_models/deeplabv3_pascal_train_aug/model.ckpt" \
-  --initialize_last_layer=false \
-  --last_layers_contain_logits_only=true \
+  --fine_tune_batch_norm=${FINE_TUNE_BATCH_NORM} \
+  --tf_initial_checkpoint="${TF_INITIAL_CHECKPOINT}" \
+  --initialize_last_layer=${INITIALIZE_LAST_LAYERS} \
+  --last_layers_contain_logits_only=${LAST_LAYERS_CONTAINS_LOGITS_ONLY} \
   --dataset="${DATASET_NAME}" \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${FORMA_DATASET_DATA}" \

@@ -104,12 +104,6 @@ DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
 DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
 LABELS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
 
-SEG_ENCODING_TYPES = {
-  'seg_name_to_label': seg_name_to_label,
-  'seg_name_to_label_7': seg_name_to_label_7,
-  'seg_name_to_label_3': seg_name_to_label_3,
-}
-
 seg_name_to_label = {
   'seg_background': 0,
   'seg_body': 1,
@@ -136,6 +130,12 @@ seg_name_to_label_3 = {
   'seg_background': 0,
   'seg_sleeves': 1,
   'seg_pants': 2,
+}
+
+SEG_ENCODING_TYPES = {
+  'seg_name_to_label': seg_name_to_label,
+  'seg_name_to_label_7': seg_name_to_label_7,
+  'seg_name_to_label_3': seg_name_to_label_3,
 }
 
 with open(LABELS_FILE, 'r') as f:
@@ -284,7 +284,7 @@ def get_seg_background(seg_dict):
 
 def main(unused_argv):
   _create_dataset_splits(DATA_DIR, FLAGS.list_folder)
-  dataset_splits = tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt'))
+  dataset_splits = sorted(tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt')))
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)
 
