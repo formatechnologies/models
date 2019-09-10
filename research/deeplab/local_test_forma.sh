@@ -96,15 +96,21 @@ export TF_FORCE_GPU_ALLOW_GROWTH=true
 # Set up the working environment.
 CURRENT_DIR=$(pwd)
 WORK_DIR="${CURRENT_DIR}/deeplab"
+DATASET_DIR="datasets"
 
 # # Run model_test first to make sure the PYTHONPATH is correctly set.
 # python3 "${WORK_DIR}"/model_test.py -v
 
-# Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
-DATASET_DIR="datasets"
-cd "${WORK_DIR}/${DATASET_DIR}"
+# # Go to datasets folder and download PASCAL VOC 2012 segmentation dataset.
+# cd "${WORK_DIR}/${DATASET_DIR}"
 # sh download_and_convert_voc2012.sh
-FORMA_DATASET_DIR="${WORK_DIR}/${DATASET_DIR}/${DATASET_NAME}"
+
+# # Go back to original directory.
+# cd "${CURRENT_DIR}"
+
+# DATASET_FOLDER = "${WORK_DIR}/${DATASET_DIR}"
+DATASET_FOLDER = "${HOME}/shared/datasets/deeplab_experiments"
+FORMA_DATASET_DIR="${DATASET_FOLDER}/${DATASET_NAME}"
 FORMA_DATASET_DATA="${FORMA_DATASET_DIR}/tfrecord"
 FORMA_DATASET_LIST="${FORMA_DATASET_DIR}/dataset_split"
 mkdir -p "${FORMA_DATASET_DATA}"
@@ -114,9 +120,6 @@ python3 ./build_forma_data.py \
     --dataset_seg_encoding_type="${DATASET_SEG_ENCODING_TYPE}" \
     --output_dir="${FORMA_DATASET_DATA}" \
     --list_folder="${FORMA_DATASET_LIST}"
-
-# Go back to original directory.
-cd "${CURRENT_DIR}"
 
 # Set up the working directories.
 EXP_FOLDER="exp/train_on_train_set"
