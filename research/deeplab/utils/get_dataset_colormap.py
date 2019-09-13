@@ -329,15 +329,15 @@ def create_pascal_label_colormap():
 
 def create_forma_label_colormap():
   return np.asarray([
-      [0, 0, 0],        # seg_background
-      [255, 0, 0],      # seg_body
-      [0, 255, 0],      # seg_garment
-      [0, 0, 255],      # seg_skin
-      [255, 255, 0],    # seg_hair
-      [255, 0, 255],    # seg_arms
-      [0, 255, 255],    # seg_shoe
-      [255, 255, 255],  # seg_sleeves
-      [128, 128, 128],  # seg_pants
+      [0, 0, 0],        # seg_background    black
+      [255, 0, 0],      # seg_body          red
+      [0, 255, 0],      # seg_garment       green
+      [0, 0, 255],      # seg_skin          blue
+      [255, 255, 0],    # seg_hair          yellow
+      [255, 0, 255],    # seg_arms          magenta
+      [0, 255, 255],    # seg_shoe          cyan
+      [255, 255, 255],  # seg_sleeves       white
+      [128, 128, 128],  # seg_pants         gray
       ])
 
 def get_ade20k_name():

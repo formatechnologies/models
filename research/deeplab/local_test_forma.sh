@@ -79,8 +79,8 @@ EVAL_CROP_SIZE="1601,3783"
 # NUM_CLASSES=7
 # EVAL_CROP_SIZE="1601,3783"
 
-DATASET_FOLDER="${WORK_DIR}/${DATASET_DIR}"
-# DATASET_FOLDER="${HOME}/storage/shared/datasets/deeplab_experiments"
+# DATASET_FOLDER="${WORK_DIR}/${DATASET_DIR}"
+DATASET_FOLDER="${HOME}/storage/shared/datasets/deeplab_experiments"
 FORMA_DATASET_DIR="${DATASET_FOLDER}/${DATASET_NAME}"
 mkdir -p "${FORMA_DATASET_DIR}"
 
@@ -98,7 +98,7 @@ FINE_TUNE_BATCH_NORM=false
 # TRAIN_BATCH_SIZE=12
 # FINE_TUNE_BATCH_NORM=true
 
-TF_INITIAL_CHECKPOINT="${DATASET_FOLDER}/forma_37k_ckpt/model.ckpt-234452"
+TF_INITIAL_CHECKPOINT="${DATASET_FOLDER}/forma_37k_ckpt/model.ckpt-740000"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
@@ -225,8 +225,8 @@ python3 "${WORK_DIR}"/export_model.py \
   --output_stride=16 \
   --decoder_output_stride=4 \
   --num_classes="${NUM_CLASSES}" \
-  --crop_size=513 \
-  --crop_size=513 \
+  --crop_size=1001 \
+  --crop_size=1001 \
   --inference_scales=1.0
 
 # Run inference with the exported checkpoint.
