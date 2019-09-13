@@ -132,11 +132,13 @@ cd "${CURRENT_DIR}"
 EXP_FOLDER="exp/train_on_train_set"
 INIT_FOLDER="${FORMA_DATASET_DIR}/init_models"
 TRAIN_LOGDIR="${FORMA_DATASET_DIR}/${EXP_FOLDER}/train"
+TRAINVAL_LOGDIR="${FORMA_DATASET_DIR}/${EXP_FOLDER}/trainval"
 EVAL_LOGDIR="${FORMA_DATASET_DIR}/${EXP_FOLDER}/eval"
 VIS_LOGDIR="${FORMA_DATASET_DIR}/${EXP_FOLDER}/vis"
 EXPORT_DIR="${FORMA_DATASET_DIR}/${EXP_FOLDER}/export"
 mkdir -p "${INIT_FOLDER}"
 mkdir -p "${TRAIN_LOGDIR}"
+mkdir -p "${TRAINVAL_LOGDIR}"
 mkdir -p "${EVAL_LOGDIR}"
 mkdir -p "${VIS_LOGDIR}"
 mkdir -p "${EXPORT_DIR}"
@@ -149,8 +151,32 @@ mkdir -p "${EXPORT_DIR}"
 # tar -xf "${TF_INIT_CKPT}"
 # cd "${CURRENT_DIR}"
 
+# # Train 10 iterations.
+# python3 "${WORK_DIR}"/train.py \
+#   --logtostderr \
+#   --train_split="train" \
+#   --model_variant="xception_65" \
+#   --atrous_rates=6 \
+#   --atrous_rates=12 \
+#   --atrous_rates=18 \
+#   --output_stride=16 \
+#   --decoder_output_stride=4 \
+#   --train_crop_size="513,513" \
+#   --train_batch_size=${TRAIN_BATCH_SIZE} \
+#   --training_number_of_steps="${NUM_ITERATIONS}" \
+#   --fine_tune_batch_norm=${FINE_TUNE_BATCH_NORM} \
+#   --tf_initial_checkpoint="${TF_INITIAL_CHECKPOINT}" \
+#   --initialize_last_layer=${INITIALIZE_LAST_LAYERS} \
+#   --last_layers_contain_logits_only=${LAST_LAYERS_CONTAINS_LOGITS_ONLY} \
+#   --dataset="${DATASET_NAME}" \
+#   --train_logdir="${TRAIN_LOGDIR}" \
+#   --dataset_dir="${FORMA_DATASET_DATA}" \
+#   --save_interaval_secs="${SAVE_INTERVAL_SECS}" \
+#   --save_summary_secs = "${SAVE_SUMMARIES_SECS}" \
+#   --save_summaries_images=true
+
 # Train 10 iterations.
-python3 "${WORK_DIR}"/train.py \
+python3 "${WORK_DIR}"/trainval.py \
   --logtostderr \
   --train_split="train" \
   --model_variant="xception_65" \
@@ -171,14 +197,19 @@ python3 "${WORK_DIR}"/train.py \
   --dataset_dir="${FORMA_DATASET_DATA}" \
   --save_interaval_secs="${SAVE_INTERVAL_SECS}" \
   --save_summary_secs = "${SAVE_SUMMARIES_SECS}" \
-  --save_summaries_images=true
+  --save_summaries_images=true \
+  --trainval_split="trainval" \
+  --trainval_batch_size=1 \
+  --trainval_crop_size="${EVAL_CROP_SIZE}" \
+  --trainval_logdir="${TRAINVAL_LOGDIR}" \
+  --trainval_interval_secs=300
 
 # Run evaluation. This performs eval over the full val split (1449 images) and
 # will take a while.
 # Using the provided checkpoint, one should expect mIOU=82.20%.
 python3 "${WORK_DIR}"/eval.py \
   --logtostderr \
-  --eval_split="trainval" \
+  --eval_split="val" \
   --model_variant="xception_65" \
   --atrous_rates=6 \
   --atrous_rates=12 \
@@ -195,7 +226,7 @@ python3 "${WORK_DIR}"/eval.py \
 # Visualize the results.
 python3 "${WORK_DIR}"/vis.py \
   --logtostderr \
-  --vis_split="trainval" \
+  --vis_split="val" \
   --model_variant="xception_65" \
   --atrous_rates=6 \
   --atrous_rates=12 \

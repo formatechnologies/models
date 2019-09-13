@@ -194,6 +194,27 @@ flags.DEFINE_string('train_split', 'train',
 
 flags.DEFINE_string('dataset_dir', None, 'Where the dataset reside.')
 
+############################# trainval flags #############################
+
+# Dataset settings.
+
+flags.DEFINE_string('trainval_split', 'trainval',
+                    'Which split of the dataset used for validation')
+
+# Settings for log directories.
+
+flags.DEFINE_string('trainval_logdir', None, 'Where to write the event logs.')
+
+# Settings for evaluating the model.
+
+flags.DEFINE_integer('trainval_batch_size', 1,
+                     'The number of images in each batch during validation.')
+
+flags.DEFINE_list('trainval_crop_size', '513,513',
+                  'Image crop size [height, width] for validation.')
+
+flags.DEFINE_integer('trainval_interval_secs', 60 * 5,
+                     'How often (in seconds) to run validation.')
 
 def _build_deeplab(iterator, outputs_to_num_classes, ignore_label):
   """Builds a clone of DeepLab.
@@ -441,7 +462,8 @@ def main(unused_argv):
           'Training batch size not divisble by number of clones (GPUs).')
       clone_batch_size = FLAGS.train_batch_size // FLAGS.num_clones
 
-      dataset = data_generator.Dataset(
+      # Define training and validation datasets with the same structure.
+      training_dataset_generator = data_generator.Dataset(
           dataset_name=FLAGS.dataset,
           split_name=FLAGS.train_split,
           dataset_dir=FLAGS.dataset_dir,
@@ -458,10 +480,70 @@ def main(unused_argv):
           is_training=True,
           should_shuffle=True,
           should_repeat=True)
+      training_dataset = training_dataset_generator.get_dataset()
+
+      validation_dataset_generator = data_generator.Dataset(
+          dataset_name=FLAGS.dataset,
+          split_name=FLAGS.trainval_split,
+          dataset_dir=FLAGS.dataset_dir,
+          batch_size=clone_batch_size,
+          crop_size=[int(sz) for sz in FLAGS.train_crop_size],
+          min_resize_value=FLAGS.min_resize_value,
+          max_resize_value=FLAGS.max_resize_value,
+          resize_factor=FLAGS.resize_factor,
+          min_scale_factor=FLAGS.min_scale_factor,
+          max_scale_factor=FLAGS.max_scale_factor,
+          scale_factor_step_size=FLAGS.scale_factor_step_size,
+          model_variant=FLAGS.model_variant,
+          num_readers=2,
+          is_training=True,
+          should_shuffle=True,
+          should_repeat=True)
+      validation_dataset = validation_dataset_generator.get_dataset()
+
+      # validation_dataset_generator = data_generator.Dataset(
+      #     dataset_name=FLAGS.dataset,
+      #     split_name=FLAGS.trainval_split,
+      #     dataset_dir=FLAGS.dataset_dir,
+      #     batch_size=FLAGS.trainval_batch_size,
+      #     crop_size=[int(sz) for sz in FLAGS.trainval_crop_size],
+      #     min_resize_value=FLAGS.min_resize_value,
+      #     max_resize_value=FLAGS.max_resize_value,
+      #     resize_factor=FLAGS.resize_factor,
+      #     model_variant=FLAGS.model_variant,
+      #     num_readers=2,
+      #     is_training=False,
+      #     should_shuffle=False,
+      #     should_repeat=False)
+      # validation_dataset = validation_dataset_generator.get_dataset()
+
+      # # A feedable iterator is defined by a handle placeholder and its structure. We
+      # # could use the `output_types` and `output_shapes` properties of either
+      # # `training_dataset` or `validation_dataset` here, because they have
+      # # identical structure.
+      # handle = tf.placeholder(tf.string, shape=[])
+      # iterator = tf.data.Iterator.from_string_handle(
+      #     handle, training_dataset.output_types, training_dataset.output_shapes)
+      # next_element = iterator.get_next()
+
+      # # You can use feedable iterators with a variety of different kinds of iterator
+      # # (such as one-shot and initializable iterators).
+      # training_iterator = training_dataset.make_one_shot_iterator()
+      # validation_iterator = validation_dataset.make_one_shot_iterator()
+
+      # A reinitializable iterator is defined by its structure. We could use the
+      # `output_types` and `output_shapes` properties of either `training_dataset`
+      # or `validation_dataset` here, because they are compatible.
+      iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
+                                                training_dataset.output_shapes)
+      next_element = iterator.get_next()
+
+      training_init_op = iterator.make_initializer(training_dataset)
+      validation_init_op = iterator.make_initializer(validation_dataset)
 
       train_tensor, summary_op = _train_deeplab_model(
-          dataset.get_one_shot_iterator(), dataset.num_of_classes,
-          dataset.ignore_label)
+          iterator, training_dataset_generator.num_of_classes,
+          training_dataset_generator.ignore_label)
 
       # Soft placement allows placing on CPU ops without GPU implementation.
       session_config = tf.ConfigProto(
@@ -503,8 +585,28 @@ def main(unused_argv):
             save_summaries_steps=FLAGS.save_summaries_secs,
             save_checkpoint_secs=FLAGS.save_interval_secs,
             hooks=[stop_hook]) as sess:
+          # # The `Iterator.string_handle()` method returns a tensor that can be evaluated
+          # # and used to feed the `handle` placeholder.
+          # training_handle = sess.run(training_iterator.string_handle())
+          # validation_handle = sess.run(validation_iterator.string_handle())
+
           while not sess.should_stop():
-            sess.run([train_tensor])
+            # for _ in range(10000):  # TODO: turn into flag
+            #   sess.run(train_tensor, feed_dict={handle: training_handle})
+
+            # # TODO: accumulate average validation loss
+            # for _ in range(1000): # TODO turn into flag
+            #   sess.run(train_tensor, feed_dict={handle: validation_handle})
+
+            # Initialize an iterator over the training dataset.
+            sess.run(training_init_op)
+            for _ in range(10000):
+              sess.run(train_tensor)
+
+            # Initialize an iterator over the validation dataset.
+            sess.run(validation_init_op)
+            for _ in range(1000):
+              sess.run(train_tensor)
 
 
 if __name__ == '__main__':
