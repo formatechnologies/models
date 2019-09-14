@@ -211,7 +211,7 @@ def _crop(image, offset_height, offset_width, crop_height, crop_width):
   return image
 
 
-def random_crop(image_list, crop_height, crop_width):
+def random_crop(image_list, crop_height, crop_width, do_affine_perturbation=False):
   """Crops the given list of images.
 
   The function applies the same crop to each image in the list. This can be
@@ -289,8 +289,39 @@ def random_crop(image_list, crop_height, crop_width):
   offset_width = tf.random_uniform(
       [], maxval=max_offset_width, dtype=tf.int32)
 
+  if do_affine_perturbation:
+    interpolation_type_list = ['BILINEAR', 'NEAREST']
+    for i in range(len(image_list)):
+      image_list[i] = centered_affine_perturbation(image_list[i],
+          offset_height, offset_width, crop_height, crop_width,
+          interpolation_type=interpolation_type_list[i])
+
   return [_crop(image, offset_height, offset_width,
                 crop_height, crop_width) for image in image_list]
+
+
+def centered_affine_perturbation(image, offset_height, offset_width, crop_height, crop_width,
+    interpolation_type='BILINEAR'):
+  """
+  Translate to crop_center, perform affine perturbation, translate back to origin
+  """
+  crop_center_x = tf.to_float(offset_width) + tf.constant(crop_width/2)
+  crop_center_y = tf.to_float(offset_height) + tf.constant(crop_height/2)
+  translations = tf.stack([crop_center_x, crop_center_y])
+
+  # https://zhengtq.github.io/2018/12/20/tf-tur-perspective-transform/
+  x = tf.random.normal([], mean=0.0, stddev=0.1)
+  y = tf.random.normal([], mean=0.0, stddev=0.1)
+  x_com = tf.random.normal([], mean=1.0, stddev=0.1)
+  y_com = tf.random.normal([], mean=1.0, stddev=0.1)
+  x_trans = tf.random.normal([], mean=0.0, stddev=0.1)
+  y_trans = tf.random.normal([], mean=0.0, stddev=0.1)
+  transforms = [x_com, x, x_trans, y, y_com, y_trans, 0, 0]
+
+  image = tf.contrib.image.translate(image, -translations, interpolation=interpolation_type, name=None)
+  image = tf.contrib.image.transform(image, transforms, interpolation=interpolation_type, name=None)
+  image = tf.contrib.image.translate(image, translations, interpolation=interpolation_type, name=None)
+  return image
 
 
 def get_random_scale(min_scale_factor, max_scale_factor, step_size):
