@@ -297,10 +297,14 @@ def random_crop(image_list, crop_height, crop_width, do_affine_perturbation=Fals
                 crop_height, crop_width) for image in image_list]
 
 
-
-def random_normal_clipped(shape, mean=0.0, stddev=0.05, dtype=tf.float32):
+def random_normal_clipped(shape=[], mean=0.0, stddev=0.05, dtype=tf.float32,
+      clip_stddev_factor=3):
+  """
+  Call tf.random.normal with the same parameters,
+  and then clip the result to the specified number of standard deviations.
+  """
   value = tf.random.normal(shape, mean=mean, stddev=stddev, dtype=dtype)
-  return tf.clip_by_value(value, -3*stddev, 3*stddev)
+  return tf.clip_by_value(value, -clip_stddev_factor*stddev, clip_stddev_factor*stddev)
 
 
 def centered_affine_perturbation(image_list,
@@ -320,13 +324,12 @@ def centered_affine_perturbation(image_list,
   transform_translate_n = [1, 0, -crop_center_x, 0, 1, -crop_center_y, 0, 0]
 
   # https://zhengtq.github.io/2018/12/20/tf-tur-perspective-transform/
-  x = random_normal_clipped
-  x = random_normal_clipped([], mean=0.0, stddev=0.05)
-  y = random_normal_clipped([], mean=0.0, stddev=0.05)
-  x_com = random_normal_clipped([], mean=1.0, stddev=0.05)
-  y_com = random_normal_clipped([], mean=1.0, stddev=0.05)
-  x_trans = random_normal_clipped([], mean=0.0, stddev=0.05)
-  y_trans = random_normal_clipped([], mean=0.0, stddev=0.05)
+  x = random_normal_clipped()
+  y = random_normal_clipped()
+  x_com = 1.0 + random_normal_clipped()
+  y_com = 1.0 + random_normal_clipped()
+  x_trans = random_normal_clipped()
+  y_trans = random_normal_clipped()
   transform_affine = [x_com, x, x_trans, y, y_com, y_trans, 0, 0]
 
   transform_list = [transform_translate_p, transform_affine, transform_translate_n]
