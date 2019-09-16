@@ -143,7 +143,7 @@ def preprocess_image_and_label(image,
     # TODO: Perspective, Smart crop based on OpenPose, GAN / Neural Style Transfer
 
     processed_image = color(processed_image)
-    processed_image = blur(processed_image)
+    processed_image = tf.cond(tf.random.uniform([], 0, 1) < 0.1, lambda: blur(processed_image), lambda: processed_image)
     processed_image = noise(processed_image)
     processed_image = tf.clip_by_value(processed_image, 0, 255)
 
