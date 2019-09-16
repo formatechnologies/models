@@ -211,7 +211,7 @@ def _crop(image, offset_height, offset_width, crop_height, crop_width):
   return image
 
 
-def random_crop(image_list, crop_height, crop_width):
+def random_crop(image_list, crop_height, crop_width, do_affine_perturbation=False):
   """Crops the given list of images.
 
   The function applies the same crop to each image in the list. This can be
@@ -289,8 +289,67 @@ def random_crop(image_list, crop_height, crop_width):
   offset_width = tf.random_uniform(
       [], maxval=max_offset_width, dtype=tf.int32)
 
+  if do_affine_perturbation:
+    image_list = centered_affine_perturbation(image_list,
+        offset_height, offset_width, crop_height, crop_width)
+
   return [_crop(image, offset_height, offset_width,
                 crop_height, crop_width) for image in image_list]
+
+
+def random_normal_clipped(shape=[], mean=0.0, stddev=0.05, dtype=tf.float32,
+      clip_stddev_factor=3):
+  """
+  Call tf.random.normal with the same parameters,
+  and then clip the result to the specified number of standard deviations.
+  """
+  value = tf.random.normal(shape, mean=mean, stddev=stddev, dtype=dtype)
+  return tf.clip_by_value(value, -clip_stddev_factor*stddev, clip_stddev_factor*stddev)
+
+
+def centered_affine_perturbation(image_list,
+      offset_height, offset_width, crop_height, crop_width):
+  """
+  Pad the image/label in case cropping near edge of image/label.
+  Translate to crop_center, perform affine perturbation, translate back to origin
+  """
+  padding_x = int(crop_width/2)
+  padding_y = int(crop_height/2)
+  paddings_image = tf.constant([[padding_y, padding_y], [padding_x, padding_x], [0, 0]])
+  paddings_label = tf.constant([[padding_y, padding_y], [padding_x, padding_x], [0, 0]])
+
+  crop_center_x = tf.constant(padding_x, dtype=tf.float32) + tf.to_float(offset_width) + tf.constant(crop_width/2)
+  crop_center_y = tf.constant(padding_y, dtype=tf.float32) + tf.to_float(offset_height) + tf.constant(crop_height/2)
+  transform_translate_p = [1, 0, crop_center_x, 0, 1, crop_center_y, 0, 0]
+  transform_translate_n = [1, 0, -crop_center_x, 0, 1, -crop_center_y, 0, 0]
+
+  # https://zhengtq.github.io/2018/12/20/tf-tur-perspective-transform/
+  x = random_normal_clipped()
+  y = random_normal_clipped()
+  x_com = 1.0 + random_normal_clipped()
+  y_com = 1.0 + random_normal_clipped()
+  x_trans = random_normal_clipped()
+  y_trans = random_normal_clipped()
+  transform_affine = [x_com, x, x_trans, y, y_com, y_trans, 0, 0]
+
+  transform_list = [transform_translate_p, transform_affine, transform_translate_n]
+  transform = tf.contrib.image.compose_transforms(*transform_list)
+
+  paddings_list = [paddings_image, paddings_label]
+  # TODO: use pad_to_bound_box and the below:
+  # pad_value_list = [mean_pixel, ignore_label]
+  pad_value_list = [127.5, 255]
+  interpolation_type_list = ['BILINEAR', 'NEAREST']
+  for i in range(len(image_list)):
+    image = image_list[i]
+
+    original_shape = tf.shape(image)
+    image = tf.pad(image, paddings_list[i], 'CONSTANT', constant_values=pad_value_list[i])
+    image = tf.contrib.image.transform(image, transform, interpolation=interpolation_type_list[i], name=None)
+    image = tf.image.crop_to_bounding_box(image, padding_y, padding_x, original_shape[0], original_shape[1])
+
+    image_list[i] = image
+  return image_list
 
 
 def get_random_scale(min_scale_factor, max_scale_factor, step_size):

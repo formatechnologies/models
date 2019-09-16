@@ -14,6 +14,7 @@
 # ==============================================================================
 
 """Prepares the data used for DeepLab training/evaluation."""
+import numpy as np
 import tensorflow as tf
 from deeplab.core import feature_extractor
 from deeplab.core import preprocess_utils
@@ -123,7 +124,8 @@ def preprocess_image_and_label(image,
   # Randomly crop the image and label.
   if is_training and label is not None:
     processed_image, label = preprocess_utils.random_crop(
-        [processed_image, label], crop_height, crop_width)
+        [processed_image, label], crop_height, crop_width,
+        do_affine_perturbation=True)
 
   processed_image.set_shape([crop_height, crop_width, 3])
 
@@ -135,4 +137,54 @@ def preprocess_image_and_label(image,
     processed_image, label, _ = preprocess_utils.flip_dim(
         [processed_image, label], _PROB_OF_FLIP, dim=1)
 
+  if is_training:
+    # TODO: expose as function parameters
+    # TODO: random order of perturbations
+    # TODO: Perspective, Smart crop based on OpenPose, GAN / Neural Style Transfer
+
+    processed_image = color(processed_image)
+    processed_image = tf.cond(tf.random.uniform([], 0, 1) < 0.1, lambda: blur(processed_image), lambda: processed_image)
+    processed_image = noise(processed_image)
+    processed_image = tf.clip_by_value(processed_image, 0, 255)
+
   return original_image, processed_image, label
+
+
+def color(x: tf.Tensor,
+          hue_max_delta=0.08,
+          saturation_facter_lb=0.6,
+          saturation_facter_ub=1.6,
+          brightness_max_delta=0.05,
+          contract_factor_lb=0.7,
+          contrast_factor_ub=1.3) -> tf.Tensor:
+  # https://www.wouterbulten.nl/blog/tech/data-augmentation-using-tensorflow-data-dataset/
+  """Color augmentation
+
+  Args:
+      x: Image
+
+  Returns:
+      Augmented image
+  """
+  x = tf.image.random_hue(x, hue_max_delta)
+  x = tf.image.random_saturation(x, saturation_facter_lb, saturation_facter_ub)
+  x = tf.image.random_brightness(x, brightness_max_delta)
+  x = tf.image.random_contrast(x, contract_factor_lb, contrast_factor_ub)
+  return x
+
+
+def blur(x, mean=0.0, stddev=1.0):
+  """
+  Resize to smaller size (AREA) and then resize to original size (BILINEAR)
+  """
+  size = tf.shape(x)[:2]
+  downsample_factor = 1 + tf.math.abs(tf.random.normal([], mean=mean, stddev=stddev))
+  small_size = tf.to_int32(tf.to_float(size)/downsample_factor)
+  x = tf.image.resize_images(x, small_size, method=tf.image.ResizeMethod.AREA)
+  x = tf.image.resize_images(x, size, method=tf.image.ResizeMethod.BILINEAR)
+  return x
+
+
+def noise(x, mean=0.0, stddev=0.01):
+  x += tf.random.normal([], mean=mean, stddev=stddev)
+  return x
