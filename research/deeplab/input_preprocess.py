@@ -137,15 +137,15 @@ def preprocess_image_and_label(image,
     processed_image, label, _ = preprocess_utils.flip_dim(
         [processed_image, label], _PROB_OF_FLIP, dim=1)
 
-  if is_training:
+  # if is_training:
     # TODO: expose as function parameters
     # TODO: random order of perturbations
     # TODO: Perspective, Smart crop based on OpenPose, GAN / Neural Style Transfer
 
-    processed_image = color(processed_image)
-    processed_image = blur(processed_image)
-    processed_image = noise(processed_image)
-    processed_image = tf.clip_by_value(processed_image, 0, 1)
+    # processed_image = color(processed_image)
+    # processed_image = blur(processed_image)
+    # processed_image = noise(processed_image)
+    # processed_image = tf.clip_by_value(processed_image, 0, 1)
 
   return original_image, processed_image, label
 
