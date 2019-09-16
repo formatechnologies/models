@@ -290,39 +290,40 @@ def random_crop(image_list, crop_height, crop_width, do_affine_perturbation=Fals
       [], maxval=max_offset_width, dtype=tf.int32)
 
   if do_affine_perturbation:
-    interpolation_type_list = ['BILINEAR', 'NEAREST']
-
-    crop_center_x = tf.to_float(offset_width) + tf.constant(crop_width/2)
-    crop_center_y = tf.to_float(offset_height) + tf.constant(crop_height/2)
-    translations = tf.stack([crop_center_x, crop_center_y])
-
-    # https://zhengtq.github.io/2018/12/20/tf-tur-perspective-transform/
-    x = tf.random.normal([], mean=0.0, stddev=0.1)
-    y = tf.random.normal([], mean=0.0, stddev=0.1)
-    x_com = tf.random.normal([], mean=1.0, stddev=0.1)
-    y_com = tf.random.normal([], mean=1.0, stddev=0.1)
-    x_trans = tf.random.normal([], mean=0.0, stddev=0.1)
-    y_trans = tf.random.normal([], mean=0.0, stddev=0.1)
-    transforms = [x_com, x, x_trans, y, y_com, y_trans, 0, 0]
-
-    # for i in range(len(image_list)):
-    #   image_list[i] = centered_affine_perturbation(image_list[i],
-    #       translations, transforms,
-    #       interpolation_type=interpolation_type_list[i])
+    image_list = centered_affine_perturbation(image_list,
+        offset_height, offset_width, crop_height, crop_width)
 
   return [_crop(image, offset_height, offset_width,
                 crop_height, crop_width) for image in image_list]
 
 
-def centered_affine_perturbation(image, translations, transforms,
-    interpolation_type='BILINEAR'):
+def centered_affine_perturbation(image_list,
+      offset_height, offset_width, crop_height, crop_width):
   """
   Translate to crop_center, perform affine perturbation, translate back to origin
   """
-  image = tf.contrib.image.translate(image, -translations, interpolation=interpolation_type, name=None)
-  image = tf.contrib.image.transform(image, transforms, interpolation=interpolation_type, name=None)
-  image = tf.contrib.image.translate(image, translations, interpolation=interpolation_type, name=None)
-  return image
+  crop_center_x = tf.to_float(offset_width) + tf.constant(crop_width/2)
+  crop_center_y = tf.to_float(offset_height) + tf.constant(crop_height/2)
+  transform_translate_p = [1, 0, crop_center_x, 0, 1, crop_center_y, 0, 0]
+  transform_translate_n = [1, 0, -crop_center_x, 0, 1, -crop_center_y, 0, 0]
+
+  # https://zhengtq.github.io/2018/12/20/tf-tur-perspective-transform/
+  x = tf.random.normal([], mean=0.0, stddev=0.1)
+  y = tf.random.normal([], mean=0.0, stddev=0.1)
+  x_com = tf.random.normal([], mean=1.0, stddev=0.1)
+  y_com = tf.random.normal([], mean=1.0, stddev=0.1)
+  x_trans = tf.random.normal([], mean=0.0, stddev=0.1)
+  y_trans = tf.random.normal([], mean=0.0, stddev=0.1)
+  transform_affine = [x_com, x, x_trans, y, y_com, y_trans, 0, 0]
+
+  transform_list = [transform_translate_p, transform_affine, transform_translate_n]
+  transform = tf.contrib.image.compose_transforms(*transform_list)
+
+  interpolation_type_list = ['BILINEAR', 'NEAREST']
+  for i in range(len(image_list)):
+    image_list[i] = tf.contrib.image.transform(image_list[i], transform,
+        interpolation=interpolation_type_list[i], name=None)
+  return image_list
 
 
 def get_random_scale(min_scale_factor, max_scale_factor, step_size):
