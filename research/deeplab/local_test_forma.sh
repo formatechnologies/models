@@ -31,79 +31,90 @@ cd ..
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 cd deeplab
 
+# ========================== SETTINGS (WORKSTATION) ==========================
+
+# # Dennis Workstation Settings
+# export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
+# NUM_CLONES=1
+# TRAIN_BATCH_SIZE=1
+# FINE_TUNE_BATCH_NORM=false
+
+# GPU 1 + GPU 2 Workstation Settings
+NUM_CLONES=8
+TRAIN_BATCH_SIZE=32
+FINE_TUNE_BATCH_NORM=true
+
 # ========================== SETTINGS (DATASET) ==========================
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
 
 # DATASET_NAME="imaterialist1k"
 # DEEPLAB_NAME="forma_1k"
 # DATASET_SIZE=1000
+# DATASET_TRAIN_SIZE=800
 # DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
 # NUM_CLASSES=9
 # EVAL_CROP_SIZE="1601,3313"
-# NUM_ITERATIONS=30000
+# NUM_EPOCHS=20
 # SAVE_INTERVAL_SECS=120
 # SAVE_SUMMARIES_SECS=120
 
 # DATASET_NAME="imaterialist1k"
 # DEEPLAB_NAME="forma_1k_3"
 # DATASET_SIZE=1000
+# DATASET_TRAIN_SIZE=800
 # DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
 # NUM_CLASSES=3
 # EVAL_CROP_SIZE="1601,3313"
-# NUM_ITERATIONS=30000
+# NUM_EPOCHS=20
 # SAVE_INTERVAL_SECS=120
 # SAVE_SUMMARIES_SECS=120
 
 # DATASET_NAME="imaterialist1k"
 # DEEPLAB_NAME="forma_1k_7"
 # DATASET_SIZE=1000
+# DATASET_TRAIN_SIZE=800
 # DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
 # NUM_CLASSES=7
 # EVAL_CROP_SIZE="1601,3313"
-# NUM_ITERATIONS=30000
+# NUM_EPOCHS=20
 # SAVE_INTERVAL_SECS=120
 # SAVE_SUMMARIES_SECS=120
 
 DATASET_NAME="imaterialist37k"
 DEEPLAB_NAME="forma_37k"
 DATASET_SIZE=-1
+DATASET_TRAIN_SIZE=29606
 DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
 NUM_CLASSES=9
 EVAL_CROP_SIZE="1601,3783"
-NUM_ITERATIONS=740000
+NUM_EPOCHS=20
 SAVE_INTERVAL_SECS=1200
 SAVE_SUMMARIES_SECS=600
 
 # DATASET_NAME="imaterialist37k"
 # DEEPLAB_NAME="forma_37k_3"
 # DATASET_SIZE=-1
+# DATASET_TRAIN_SIZE=29606
 # DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
 # NUM_CLASSES=3
 # EVAL_CROP_SIZE="1601,3783"
-# NUM_ITERATIONS=740000
+# NUM_EPOCHS=20
 # SAVE_INTERVAL_SECS=1200
 # SAVE_SUMMARIES_SECS=600
 
 # DATASET_NAME="imaterialist37k"
 # DEEPLAB_NAME="forma_37k_7"
 # DATASET_SIZE=-1
+# DATASET_TRAIN_SIZE=29606
 # DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
 # NUM_CLASSES=7
 # EVAL_CROP_SIZE="1601,3783"
-# NUM_ITERATIONS=740000
+# NUM_EPOCHS=20
 # SAVE_INTERVAL_SECS=1200
 # SAVE_SUMMARIES_SECS=600
 
-# ========================== SETTINGS (WORKSTATION) ==========================
-
-# Dennis Workstation Settings
-export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
-TRAIN_BATCH_SIZE=1
-FINE_TUNE_BATCH_NORM=false
-
-# # GPU 1 + GPU 2 Workstation Settings
-# TRAIN_BATCH_SIZE=12
-# FINE_TUNE_BATCH_NORM=true
+NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
+NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
 
 # ========================== SETTINGS (PATHS) ==========================
 
@@ -174,6 +185,7 @@ python3 ./train.py \
   --output_stride=16 \
   --decoder_output_stride=4 \
   --train_crop_size="513,513" \
+  --num_clones=${NUM_CLONES} \
   --train_batch_size=${TRAIN_BATCH_SIZE} \
   --training_number_of_steps="${NUM_ITERATIONS}" \
   --fine_tune_batch_norm=${FINE_TUNE_BATCH_NORM} \
