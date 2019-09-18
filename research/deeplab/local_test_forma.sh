@@ -33,16 +33,16 @@ cd deeplab
 
 # ========================== SETTINGS (WORKSTATION) ==========================
 
-# # Dennis Workstation Settings
-# export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
-# NUM_CLONES=1
-# TRAIN_BATCH_SIZE=1
-# FINE_TUNE_BATCH_NORM=false
+# Dennis Workstation Settings
+export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
+NUM_CLONES=1
+TRAIN_BATCH_SIZE=1
+FINE_TUNE_BATCH_NORM=false
 
-# GPU 1 + GPU 2 Workstation Settings
-NUM_CLONES=8
-TRAIN_BATCH_SIZE=32
-FINE_TUNE_BATCH_NORM=true
+# # GPU 1 + GPU 2 Workstation Settings
+# NUM_CLONES=8
+# TRAIN_BATCH_SIZE=32
+# FINE_TUNE_BATCH_NORM=true
 
 # ========================== SETTINGS (DATASET) ==========================
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
