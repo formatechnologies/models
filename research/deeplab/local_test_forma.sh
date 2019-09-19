@@ -40,8 +40,12 @@ cd deeplab
 # FINE_TUNE_BATCH_NORM=false
 
 # GPU 1 + GPU 2 Workstation Settings
-NUM_CLONES=8
-TRAIN_BATCH_SIZE=32
+# NUM_CLONES=8
+# TRAIN_BATCH_SIZE=8
+# FINE_TUNE_BATCH_NORM=false
+
+NUM_CLONES=4  # Don't use 8, draws too much power
+TRAIN_BATCH_SIZE=16
 FINE_TUNE_BATCH_NORM=true
 
 # ========================== SETTINGS (DATASET) ==========================
@@ -116,6 +120,22 @@ SAVE_SUMMARIES_SECS=600
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
 NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
 
+ATROUS_RATE_1=6
+ATROUS_RATE_2=12
+ATROUS_RATE_3=18
+OUTPUT_STRIDE=16
+
+# ATROUS_RATE_1=12
+# ATROUS_RATE_2=24
+# ATROUS_RATE_3=36
+# OUTPUT_STRIDE=8
+
+EVAL_OUTPUT_STRIDE=8
+MODEL_VARIANT="xception_65"
+DECODER_OUTPUT_STRIDE=4
+
+BASE_LEARNING_RATE=0.007
+
 # ========================== SETTINGS (PATHS) ==========================
 
 # Deeplab Path
@@ -130,7 +150,8 @@ EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k/model.ckpt-740000"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-366824"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-366824"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-693543"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
@@ -146,7 +167,7 @@ mkdir -p "${DATASET_SPLIT}"
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="augmented"
+EXPERIMENT_DESCRIPTION="augmented_learn_rate_007_output_stride_${OUTPUT_STRIDE}_batch_size_${TRAIN_BATCH_SIZE}"
 
 EXPERIMENT_NAME="${HOSTNAME}_${USER}_${DATASET_NAME}_${EXPERIMENT_DESCRIPTION}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
@@ -178,16 +199,17 @@ python3 ./datasets/build_forma_data.py \
 python3 ./train.py \
   --logtostderr \
   --train_split="train" \
-  --model_variant="xception_65" \
-  --atrous_rates=6 \
-  --atrous_rates=12 \
-  --atrous_rates=18 \
-  --output_stride=16 \
-  --decoder_output_stride=4 \
+  --model_variant=${MODEL_VARIANT} \
+  --atrous_rates=${ATROUS_RATE_1} \
+  --atrous_rates=${ATROUS_RATE_2} \
+  --atrous_rates=${ATROUS_RATE_3} \
+  --output_stride=${OUTPUT_STRIDE} \
+  --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --train_crop_size="513,513" \
   --num_clones=${NUM_CLONES} \
   --train_batch_size=${TRAIN_BATCH_SIZE} \
   --training_number_of_steps="${NUM_ITERATIONS}" \
+  --base_learning_rate=${BASE_LEARNING_RATE} \
   --fine_tune_batch_norm=${FINE_TUNE_BATCH_NORM} \
   --tf_initial_checkpoint="${TF_INITIAL_CHECKPOINT}" \
   --initialize_last_layer=${INITIALIZE_LAST_LAYERS} \
@@ -205,12 +227,12 @@ python3 ./train.py \
 python3 ./eval.py \
   --logtostderr \
   --eval_split="trainval" \
-  --model_variant="xception_65" \
-  --atrous_rates=6 \
-  --atrous_rates=12 \
-  --atrous_rates=18 \
-  --output_stride=16 \
-  --decoder_output_stride=4 \
+  --model_variant=${MODEL_VARIANT} \
+  --atrous_rates=${ATROUS_RATE_1} \
+  --atrous_rates=${ATROUS_RATE_2} \
+  --atrous_rates=${ATROUS_RATE_3} \
+  --output_stride=${EVAL_OUTPUT_STRIDE} \
+  --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --eval_crop_size="${EVAL_CROP_SIZE}" \
   --dataset="${DEEPLAB_NAME}" \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
@@ -222,12 +244,12 @@ python3 ./eval.py \
 python3 ./vis.py \
   --logtostderr \
   --vis_split="trainval" \
-  --model_variant="xception_65" \
-  --atrous_rates=6 \
-  --atrous_rates=12 \
-  --atrous_rates=18 \
-  --output_stride=16 \
-  --decoder_output_stride=4 \
+  --model_variant=${MODEL_VARIANT} \
+  --atrous_rates=${ATROUS_RATE_1} \
+  --atrous_rates=${ATROUS_RATE_2} \
+  --atrous_rates=${ATROUS_RATE_3} \
+  --output_stride=${EVAL_OUTPUT_STRIDE} \
+  --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --vis_crop_size="${EVAL_CROP_SIZE}" \
   --dataset="${DEEPLAB_NAME}" \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
@@ -241,12 +263,12 @@ python3 ./export_model.py \
   --logtostderr \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \
-  --model_variant="xception_65" \
-  --atrous_rates=6 \
-  --atrous_rates=12 \
-  --atrous_rates=18 \
-  --output_stride=16 \
-  --decoder_output_stride=4 \
+  --model_variant=${MODEL_VARIANT} \
+  --atrous_rates=${ATROUS_RATE_1} \
+  --atrous_rates=${ATROUS_RATE_2} \
+  --atrous_rates=${ATROUS_RATE_3} \
+  --output_stride=${EVAL_OUTPUT_STRIDE} \
+  --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --num_classes="${NUM_CLASSES}" \
   --crop_size=1001 \
   --crop_size=1001 \

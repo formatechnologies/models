@@ -1,3 +1,164 @@
+# DeepLab V3+ Hyperparameters
+
+https://arxiv.org/pdf/1706.05587.pdf
+
+## Build Forma Data
+
+* TODO
+
+## Data Generator
+
+* TODO
+* affine transformation (not exposed as parameter, in code only)
+* color (HSB + contrast) (not exposed as parameter, in code only)
+* blur + noise (not exposed as parameter, in code only)
+
+## Train
+
+### Dataset
+
+* dataset: name of the segmentation dataset, this affects settings deep in the code
+  * if creating a custom dataset, make sure to investigate everywhere this is used
+* dataset_dir
+* train_split: train, trainval, val, test
+  * TODO: retrain on all data (train, trainval, val)
+
+### Data Augmentation
+
+* min_scale_factor
+* max_scale_factor
+* scale_factor_step_size
+
+### Model Initialization
+
+* tf_initial_checkpoint
+* initialize_last_layer
+  * true: reuse the entire model
+  * false: don't reuse the last layer (defined by last_layers_contain_logits_only)
+* last_layers_contain_logits_only (assumes initialize_last_layer=false)
+  * true: the last layer contains the logits only (use this if you have a different number of classes)
+  * false: the last layer contains logits, image pooling, aspp, concat_projection, decoder, meta_architecture
+    * TODO: train from scratch (backbone weights only) with learn rate = 0.007 -> fine tune learn rate 0.0001
+* last_layer_gradient_multiplier
+* slow_start_step
+* slow_start_learning_rate
+
+### Settings for multi-GPUs/multi-replicas training.
+
+* num_clones
+  * Choose maximal number of clones to maximize batch size
+  * Use 4 clones at most (8 clones will draw all the power in the gpu server room)
+* clone_on_cpu
+* num_replicas
+* startup_delay_steps
+* num_ps_tasks
+* master
+* task
+
+### GPU Memory Constrained Settings
+* output_stride
+  * use output_stride = 16 by default
+  * use output_stride = 8 for slightly better performance but longer training
+  * finetune an output_stride=16 network by continuing training with output_stride=8
+* atrous_rates
+  * if output_stride = 8, use [12, 24, 36]
+  * if output_stride = 16, use [6, 12, 18]
+* train_batch_size
+  * use maximal batch size for each clone:
+    * 12GB memory = batch size 4 + output stride 16
+    * 12GB memory = batch size 1 + output stride 8
+  * use maximal batch size across all clones
+    * 4 clones * batch size 4 / clone = total batch size 16
+  * batch size 32 > batch size 16 > batch size 8 > batch size 4
+* fine_tune_batch_norm: set to true if batch_size >= 12, else false
+* train_crop_size: [513, 513]
+  * TODO: test [1024, 1024] crop size (is higher resolution image better?)
+
+### Learning Rate
+
+* training_number_of_steps
+* learning_policy
+* base_learning_rate
+  * use 0.007 for initially training
+  * use 0.0001 for finetuning
+* learning_rate_decay_factor
+* learning_rate_decay_step
+* learning_power
+* momentum
+* weight_decay
+
+### Settings for logging.
+
+* train_logdir
+* log_steps
+* save_interval_secs
+* save_summaries_secs
+* save_summaries_images
+
+### Miscellaneous
+
+* upsample_logits (or downsample labels when computing loss)
+* drop_path_keep_prob (NAS training strategy)
+* hard_example_mining_step (hard example mining)
+* top_k_percent_pixels (hard example mining)
+* quantize_delay_step (quanitization)
+* profile_logdir (profiling)
+
+## Eval / Vis / Export
+
+### Dataset
+
+* dataset: name of the segmentation dataset, this affects settings deep in the code
+  * if creating a custom dataset, make sure to investigate everywhere this is used
+* dataset_dir
+* train_split: train, trainval, val, test
+
+### Model Initialization
+
+* checkpoint_dir
+
+### GPU Memory Constrained Settings
+
+* output_stride
+  * use output_stride = 16 by default
+  * use output_stride = 8 for slightly better performance but longer eval
+  * TODO: test
+* atrous_rates
+  * if output_stride = 8, use [12, 24, 36]
+  * if output_stride = 16, use [6, 12, 18]
+* eval_batch_size / vis_batch_size: 1
+* eval_crop_size / vis_crop_size: set to size of largest image in dataset
+
+### Other Evaluation Settings
+
+* eval_scales / inference_scales
+  * default: [1.0]
+  * slightly better performance but slower: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+  * TODO: test
+* add_flipped_images
+
+### Logging / Visualization
+
+* eval_logdir / vis_logdir
+* eval_interval_secs
+* max_number_of_evaluations
+* colormap_type
+  * if creating a custom dataset, make sure to investigate everywhere this is used
+* also_save_raw_predictions
+
+### Export
+
+* checkpoint_path
+* export_path
+* num_classes
+* crop_size: [1001, 10001] because we crop to 1000 x 1000 images
+* save_inference_graph
+
+### Miscellaneous
+
+* master
+* quantize_delay_step
+
 # DeepLab: Deep Labelling for Semantic Image Segmentation
 
 DeepLab is a state-of-art deep learning model for semantic image segmentation,
