@@ -89,7 +89,7 @@
 * quantize_delay_step (quanitization)
 * profile_logdir (profiling)
 
-## Eval
+## Eval / Vis
 
 ### Dataset
 
@@ -111,8 +111,8 @@
 * atrous_rates
   * if output_stride = 8, use [12, 24, 36]
   * if output_stride = 16, use [6, 12, 18]
-* eval_batch_size
-* eval_crop_size: [513, 513]
+* eval_batch_size / vis_batch_size
+* eval_crop_size / vis_crop_size: [513, 513]
 
 ### Other Evaluation Settings
 
@@ -122,11 +122,14 @@
   * TODO: test
 * add_flipped_images
 
-### Logging
+### Logging / Visualization
 
-* eval_logdir
+* eval_logdir / vis_logdir
 * eval_interval_secs
 * max_number_of_evaluations
+* colormap_type
+  * if creating a custom dataset, make sure to investigate everywhere this is used
+* also_save_raw_predictions
 
 ### Miscellaneous
 
