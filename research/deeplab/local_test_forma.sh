@@ -44,7 +44,7 @@ cd deeplab
 # TRAIN_BATCH_SIZE=8
 # FINE_TUNE_BATCH_NORM=false
 
-NUM_CLONES=8
+NUM_CLONES=4  # Don't use 8, draws too much power
 TRAIN_BATCH_SIZE=16
 FINE_TUNE_BATCH_NORM=true
 
