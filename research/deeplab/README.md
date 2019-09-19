@@ -1,5 +1,7 @@
 # DeepLab V3+ Hyperparameters
 
+https://arxiv.org/pdf/1706.05587.pdf
+
 ## Build Forma Data
 
 * TODO
@@ -19,6 +21,7 @@
   * if creating a custom dataset, make sure to investigate everywhere this is used
 * dataset_dir
 * train_split: train, trainval, val, test
+  * TODO: retrain on all data (train, trainval, val)
 
 ### Data Augmentation
 
@@ -35,6 +38,7 @@
 * last_layers_contain_logits_only (assumes initialize_last_layer=false)
   * true: the last layer contains the logits only (use this if you have a different number of classes)
   * false: the last layer contains logits, image pooling, aspp, concat_projection, decoder, meta_architecture
+    * TODO: train from scratch (backbone weights only) with learn rate = 0.007 -> fine tune learn rate 0.0001
 * last_layer_gradient_multiplier
 * slow_start_step
 * slow_start_learning_rate
@@ -67,8 +71,8 @@
     * 4 clones * batch size 4 / clone = total batch size 16
   * batch size 32 > batch size 16 > batch size 8 > batch size 4
 * fine_tune_batch_norm: set to true if batch_size >= 12, else false
-* train_crop_size
-  * TODO: test if bigger crop size is better
+* train_crop_size: [513, 513]
+  * TODO: test [1024, 1024] crop size (is higher resolution image better?)
 
 ### Learning Rate
 
@@ -122,8 +126,8 @@
 * atrous_rates
   * if output_stride = 8, use [12, 24, 36]
   * if output_stride = 16, use [6, 12, 18]
-* eval_batch_size / vis_batch_size
-* eval_crop_size / vis_crop_size: [513, 513]
+* eval_batch_size / vis_batch_size: 1
+* eval_crop_size / vis_crop_size: set to size of largest image in dataset
 
 ### Other Evaluation Settings
 
