@@ -89,6 +89,50 @@
 * quantize_delay_step (quanitization)
 * profile_logdir (profiling)
 
+## Eval
+
+### Dataset
+
+* dataset: name of the segmentation dataset, this affects settings deep in the code
+  * if creating a custom dataset, make sure to investigate everywhere this is used
+* dataset_dir
+* train_split: train, trainval, val, test
+
+### Model Initialization
+
+* checkpoint_dir
+
+### GPU Memory Constrained Settings
+
+* output_stride
+  * use output_stride = 16 by default
+  * use output_stride = 8 for slightly better performance but longer eval
+  * TODO: test
+* atrous_rates
+  * if output_stride = 8, use [12, 24, 36]
+  * if output_stride = 16, use [6, 12, 18]
+* eval_batch_size
+* eval_crop_size: [513, 513]
+
+### Other Evaluation Settings
+
+* eval_scales
+  * default: [1.0]
+  * slightly better performance but slower: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+  * TODO: test
+* add_flipped_images
+
+### Logging
+
+* eval_logdir
+* eval_interval_secs
+* max_number_of_evaluations
+
+### Miscellaneous
+
+* master
+* quantize_delay_step
+
 # DeepLab: Deep Labelling for Semantic Image Segmentation
 
 DeepLab is a state-of-art deep learning model for semantic image segmentation,
