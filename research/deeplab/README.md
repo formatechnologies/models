@@ -89,7 +89,7 @@
 * quantize_delay_step (quanitization)
 * profile_logdir (profiling)
 
-## Eval / Vis
+## Eval / Vis / Export
 
 ### Dataset
 
@@ -116,7 +116,7 @@
 
 ### Other Evaluation Settings
 
-* eval_scales
+* eval_scales / inference_scales
   * default: [1.0]
   * slightly better performance but slower: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
   * TODO: test
@@ -130,6 +130,14 @@
 * colormap_type
   * if creating a custom dataset, make sure to investigate everywhere this is used
 * also_save_raw_predictions
+
+### Export
+
+* checkpoint_path
+* export_path
+* num_classes
+* crop_size: [1001, 10001] because we crop to 1000 x 1000 images
+* save_inference_graph
 
 ### Miscellaneous
 
