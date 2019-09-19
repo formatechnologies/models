@@ -40,9 +40,13 @@ cd deeplab
 # FINE_TUNE_BATCH_NORM=false
 
 # GPU 1 + GPU 2 Workstation Settings
+# NUM_CLONES=8
+# TRAIN_BATCH_SIZE=8
+# FINE_TUNE_BATCH_NORM=false
+
 NUM_CLONES=8
-TRAIN_BATCH_SIZE=8
-FINE_TUNE_BATCH_NORM=false
+TRAIN_BATCH_SIZE=32
+FINE_TUNE_BATCH_NORM=true
 
 # ========================== SETTINGS (DATASET) ==========================
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
@@ -162,7 +166,7 @@ mkdir -p "${DATASET_SPLIT}"
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="augmented_learn_rate_007_output_stride_8_batch_size_8"
+EXPERIMENT_DESCRIPTION="augmented_learn_rate_007_output_stride_8_batch_size_32"
 
 EXPERIMENT_NAME="${HOSTNAME}_${USER}_${DATASET_NAME}_${EXPERIMENT_DESCRIPTION}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
