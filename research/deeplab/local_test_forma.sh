@@ -45,7 +45,7 @@ cd deeplab
 # FINE_TUNE_BATCH_NORM=false
 
 NUM_CLONES=8
-TRAIN_BATCH_SIZE=32
+TRAIN_BATCH_SIZE=16
 FINE_TUNE_BATCH_NORM=true
 
 # ========================== SETTINGS (DATASET) ==========================
@@ -120,16 +120,17 @@ SAVE_SUMMARIES_SECS=600
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
 NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
 
-# ATROUS_RATE_1=6
-# ATROUS_RATE_2=12
-# ATROUS_RATE_3=18
-# OUTPUT_STRIDE=16
+ATROUS_RATE_1=6
+ATROUS_RATE_2=12
+ATROUS_RATE_3=18
+OUTPUT_STRIDE=16
 
-ATROUS_RATE_1=12
-ATROUS_RATE_2=24
-ATROUS_RATE_3=36
-OUTPUT_STRIDE=8
+# ATROUS_RATE_1=12
+# ATROUS_RATE_2=24
+# ATROUS_RATE_3=36
+# OUTPUT_STRIDE=8
 
+EVAL_OUTPUT_STRIDE=8
 MODEL_VARIANT="xception_65"
 DECODER_OUTPUT_STRIDE=4
 
@@ -166,7 +167,7 @@ mkdir -p "${DATASET_SPLIT}"
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="augmented_learn_rate_007_output_stride_8_batch_size_32"
+EXPERIMENT_DESCRIPTION="augmented_learn_rate_007_output_stride_${OUTPUT_STRIDE}_batch_size_${TRAIN_BATCH_SIZE}"
 
 EXPERIMENT_NAME="${HOSTNAME}_${USER}_${DATASET_NAME}_${EXPERIMENT_DESCRIPTION}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
@@ -230,7 +231,7 @@ python3 ./eval.py \
   --atrous_rates=${ATROUS_RATE_1} \
   --atrous_rates=${ATROUS_RATE_2} \
   --atrous_rates=${ATROUS_RATE_3} \
-  --output_stride=${OUTPUT_STRIDE} \
+  --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --eval_crop_size="${EVAL_CROP_SIZE}" \
   --dataset="${DEEPLAB_NAME}" \
@@ -247,7 +248,7 @@ python3 ./vis.py \
   --atrous_rates=${ATROUS_RATE_1} \
   --atrous_rates=${ATROUS_RATE_2} \
   --atrous_rates=${ATROUS_RATE_3} \
-  --output_stride=${OUTPUT_STRIDE} \
+  --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --vis_crop_size="${EVAL_CROP_SIZE}" \
   --dataset="${DEEPLAB_NAME}" \
@@ -266,7 +267,7 @@ python3 ./export_model.py \
   --atrous_rates=${ATROUS_RATE_1} \
   --atrous_rates=${ATROUS_RATE_2} \
   --atrous_rates=${ATROUS_RATE_3} \
-  --output_stride=${OUTPUT_STRIDE} \
+  --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --num_classes="${NUM_CLASSES}" \
   --crop_size=1001 \
