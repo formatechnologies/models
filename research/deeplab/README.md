@@ -1,5 +1,16 @@
 # DeepLab V3+ Hyperparameters
 
+## Build Forma Data
+
+* TODO
+
+## Data Generator
+
+* TODO
+* affine transformation (not exposed as parameter, in code only)
+* color (HSB + contrast) (not exposed as parameter, in code only)
+* blur + noise (not exposed as parameter, in code only)
+
 ## Train
 
 ### Dataset
