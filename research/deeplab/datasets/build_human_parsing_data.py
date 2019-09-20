@@ -68,6 +68,8 @@ import cv2
 from utility.paths import STORAGE_DIR
 from utility.json_tools import load_dict_from_json
 
+from deeplab_model.deeplab import HumanParsingMachine
+
 FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string('image_folder',
@@ -153,7 +155,6 @@ with open(HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE, 'r') as f:
   lines = [line.strip().split(' ') for line in f.readlines()]
 human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
 
-from deeplab import HumanParsingMachine
 human_parsing_machine = HumanParsingMachine()
 
 # max_h, max_w = 0, 0
