@@ -101,8 +101,13 @@ tf.app.flags.DEFINE_string(
 _NUM_PER_SHARD = 500
 
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
-DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
-LABELS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
+
+IMATERLIAST_DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
+IMATERIALIST_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
+
+HUMAN_PARSING_IMAGE_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/JPEGImages/')
+HUMAN_PARSING_LABEL_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/SegmentationClassAug/')
+HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/atr_label.txt')
 
 seg_name_to_label = {
   'seg_background': 0,
@@ -138,16 +143,20 @@ SEG_ENCODING_TYPES = {
   'seg_name_to_label_3': seg_name_to_label_3,
 }
 
-with open(LABELS_FILE, 'r') as f:
+with open(IMATERIALIST_LABEL_DESCRIPTIONS_FILE, 'r') as f:
   label_descriptions = json.load(f)
-fashion_names_to_bits = {item['name']: item['id'] for item in label_descriptions['categories']}
+imaterialist_labels_to_numbers = {item['name']: item['id'] for item in label_descriptions['categories']}
+
+with open(HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE, 'r') as f:
+  lines = [line.strip().split(' ') for line in f.readlines()]
+human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
 
 # max_h, max_w = 0, 0
-# filenames = sorted(os.listdir(DATA_DIR))
+# filenames = sorted(os.listdir(IMATERLIAST_DATA_DIR))
 # if FLAGS.dataset_size != -1:
 #   filenames = filenames[:FLAGS.dataset_size]
 # for filename in tqdm(filenames):
-#   json_filename = os.path.join(DATA_DIR, filename)
+#   json_filename = os.path.join(IMATERLIAST_DATA_DIR, filename)
 #   example = load_dict_from_json(json_filename)
 #   h, w, _ = example['image'].shape
 #   max_h = max(max_h, h)
@@ -206,14 +215,14 @@ def _convert_dataset(dataset_split):
       end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
       for i in tqdm(range(start_idx, end_idx)):
         # Read the image.
-        json_filename = os.path.join(DATA_DIR, filenames[i])
+        json_filename = os.path.join(IMATERLIAST_DATA_DIR, filenames[i])
         example = load_dict_from_json(json_filename)
         image = example['image']
         image_data = to_image_bytestring(image, '.jpg')
         height, width = image.shape[:2]
 
         # Read the semantic segmentation annotation.
-        fashion_dict = decode_segmentation(example['seg_fashion_parsing'], fashion_names_to_bits)
+        fashion_dict = decode_segmentation(example['seg_fashion_parsing'], imaterialist_labels_to_numbers)
         seg_dict = {k: v for k, v in example.items() if k in SEG_ENCODING_TYPES[FLAGS.seg_encoding_type]}
         seg_dict['seg_sleeves'] = fashion_dict['sleeve']
         seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
@@ -283,7 +292,7 @@ def get_seg_background(seg_dict):
   return image
 
 def main(unused_argv):
-  _create_dataset_splits(DATA_DIR, FLAGS.list_folder)
+  _create_dataset_splits(IMATERLIAST_DATA_DIR, FLAGS.list_folder)
   dataset_splits = sorted(tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt')))
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)
