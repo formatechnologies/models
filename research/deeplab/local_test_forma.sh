@@ -163,6 +163,14 @@ mkdir -p "${DATASET_DIR}"
 mkdir -p "${DATASET_TFRECORD}"
 mkdir -p "${DATASET_SPLIT}"
 
+DATASET_NAME2='humanparsing17k'
+DATASET_DIR2="${DATASETS_DIR}/${DATASET_NAME2}"
+DATASET_TFRECORD2="${DATASET_DIR2}/tfrecord"
+DATASET_SPLIT2="${DATASET_DIR2}/dataset_split"
+mkdir -p "${DATASET_DIR2}"
+mkdir -p "${DATASET_TFRECORD2}"
+mkdir -p "${DATASET_SPLIT2}"
+
 # Experiment Paths
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
@@ -194,6 +202,14 @@ python3 ./datasets/build_forma_data.py \
     --dataset_seg_encoding_type="${DATASET_SEG_ENCODING_TYPE}" \
     --output_dir="${DATASET_TFRECORD}" \
     --list_folder="${DATASET_SPLIT}"
+
+# TODO: make data input dir a TF flag
+# Build form data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
+python3 ./datasets/build_human_parsing_data.py \
+    --dataset_size=${DATASET_SIZE} \
+    --dataset_seg_encoding_type="${DATASET_SEG_ENCODING_TYPE}" \
+    --output_dir="${DATASET_TFRECORD2}" \
+    --list_folder="${DATASET_SPLIT2}"
 
 # Train.
 python3 ./train.py \
