@@ -153,6 +153,9 @@ with open(HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE, 'r') as f:
   lines = [line.strip().split(' ') for line in f.readlines()]
 human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
 
+from deeplab import HumanParsingMachine
+human_parsing_machine = HumanParsingMachine()
+
 # max_h, max_w = 0, 0
 # filenames = sorted(os.listdir(HUMAN_PARSING_IMAGE_DIR))
 # if FLAGS.dataset_size != -1:
@@ -219,18 +222,41 @@ def _convert_dataset(dataset_split):
       end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
       for i in tqdm(range(start_idx, end_idx)):
         # Read the image.
-        json_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filenames[i])
-        example = load_dict_from_json(json_filename)
-        image = example['image']
+        image_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, f'{filenames[i]}.jpg')
+        image = cv2.imread(image_filename)
         image_data = to_image_bytestring(image, '.jpg')
         height, width = image.shape[:2]
 
         # Read the semantic segmentation annotation.
-        fashion_dict = decode_segmentation(example['seg_fashion_parsing'], imaterialist_labels_to_numbers)
-        seg_dict = {k: v for k, v in example.items() if k in SEG_ENCODING_TYPES[FLAGS.seg_encoding_type]}
-        seg_dict['seg_sleeves'] = fashion_dict['sleeve']
-        seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
-        seg_dict['seg_background'] = get_seg_background(seg_dict)
+        seg_filename = os.path.join(HUMAN_PARSING_LABEL_DIR, f'{filenames[i]}.png')
+        seg = cv2.imread(seg_filename)
+        example = decode_segmentation_exclusive(seg, human_parsing_labels_to_numbers)
+        example = {k: v[:, :, 0] for k, v in example.items()}
+
+        def multi_max(dct, lst):
+          max_mask = dct[lst[0]]
+          for i in range(1, len(lst)):
+            max_mask = np.maximum(max_mask, dct[lst[i]])
+          return max_mask
+
+        seg_dict = {}
+        seg_dict['seg_background'] = multi_max(example, ['background'])
+        seg_dict['seg_body'] = multi_max(example, ['hat', 'sunglass', 'bag'])  # 255 - example['background']
+        seg_dict['seg_garment'] = multi_max(example, ['upper-clothes', 'dress', 'skirt', 'pants', 'belt', 'scarf'])
+        seg_dict['seg_skin'] = multi_max(example, ['face', 'left-leg', 'right-leg'])
+        seg_dict['seg_hair'] = multi_max(example, ['hair'])
+        seg_dict['seg_arms'] = multi_max(example, ['left-arm', 'right-arm'])
+        seg_dict['seg_shoe'] = multi_max(example, ['left-shoe', 'right-shoe'])
+
+        example = human_parsing_machine.run(image)
+        seg_dict['seg_sleeves'] = example['seg_sleeves']
+        seg_dict['seg_pants'] = example['seg_pants']
+
+        # fashion_dict = decode_segmentation(example['seg_fashion_parsing'], imaterialist_labels_to_numbers)
+        # seg_dict = {k: v for k, v in example.items() if k in SEG_ENCODING_TYPES[FLAGS.seg_encoding_type]}
+        # seg_dict['seg_sleeves'] = fashion_dict['sleeve']
+        # seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
+        # seg_dict['seg_background'] = get_seg_background(seg_dict)
         seg = encode_segmentation_exclusive(seg_dict, SEG_ENCODING_TYPES[FLAGS.seg_encoding_type])
         seg = seg[:, :, np.newaxis].repeat(3, axis=2)
         seg_data = to_image_bytestring(seg, '.png')
