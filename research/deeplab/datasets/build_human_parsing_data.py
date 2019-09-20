@@ -59,6 +59,8 @@ import tensorflow as tf
 import glob
 import json
 from tqdm import tqdm
+import random
+random.seed(0)
 
 import numpy as np
 import cv2
@@ -152,11 +154,11 @@ with open(HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE, 'r') as f:
 human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
 
 # max_h, max_w = 0, 0
-# filenames = sorted(os.listdir(IMATERLIAST_DATA_DIR))
+# filenames = sorted(os.listdir(HUMAN_PARSING_IMAGE_DIR))
 # if FLAGS.dataset_size != -1:
 #   filenames = filenames[:FLAGS.dataset_size]
 # for filename in tqdm(filenames):
-#   json_filename = os.path.join(IMATERLIAST_DATA_DIR, filename)
+#   json_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filename)
 #   example = load_dict_from_json(json_filename)
 #   h, w, _ = example['image'].shape
 #   max_h = max(max_h, h)
@@ -165,9 +167,11 @@ human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
   filenames = sorted(os.listdir(data_dir))
+  filenames = [os.path.splitext(filename)[0] for filename in filenames]
   if FLAGS.dataset_size != -1:
     filenames = filenames[:FLAGS.dataset_size]
 
+  random.shuffle(filenames)
   train_split = int(0.8 * len(filenames))
   valid_split = int(0.9 * len(filenames))
 
@@ -215,7 +219,7 @@ def _convert_dataset(dataset_split):
       end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
       for i in tqdm(range(start_idx, end_idx)):
         # Read the image.
-        json_filename = os.path.join(IMATERLIAST_DATA_DIR, filenames[i])
+        json_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filenames[i])
         example = load_dict_from_json(json_filename)
         image = example['image']
         image_data = to_image_bytestring(image, '.jpg')
@@ -292,7 +296,7 @@ def get_seg_background(seg_dict):
   return image
 
 def main(unused_argv):
-  _create_dataset_splits(IMATERLIAST_DATA_DIR, FLAGS.list_folder)
+  _create_dataset_splits(HUMAN_PARSING_IMAGE_DIR, FLAGS.list_folder)
   dataset_splits = sorted(tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt')))
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)
