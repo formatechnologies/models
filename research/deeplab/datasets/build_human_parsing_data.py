@@ -249,7 +249,10 @@ def _convert_dataset(dataset_split):
         seg_dict['seg_arms'] = multi_max(example, ['left-arm', 'right-arm'])
         seg_dict['seg_shoe'] = multi_max(example, ['left-shoe', 'right-shoe'])
 
-        example = human_parsing_machine.run(image)
+        image_ds = reduce_image_size2(image, max_height=1000, max_width=1000)
+        example = human_parsing_machine.run(image_ds)
+        if image_ds.shape != image.shape:
+          example = {k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST) for k, v in example.items()}
         seg_dict['seg_sleeves'] = example['seg_sleeves']
         seg_dict['seg_pants'] = example['seg_pants']
 
@@ -270,6 +273,20 @@ def _convert_dataset(dataset_split):
         example = build_data.image_seg_to_tfexample(
             image_data, filenames[i], height, width, seg_data)
         tfrecord_writer.write(example.SerializeToString())
+
+def reduce_image_size2(image, max_height=1000, max_width=1000):
+    """
+    Reduce an numpy array image to a certain max size
+    """
+    h, w, _ = image.shape
+
+    ratio_h = h / max_height
+    ratio_w = w / max_width
+    ratio = max(ratio_h, ratio_w)
+    if ratio < 1:
+        return image
+    return cv2.resize(image, (int(w/ratio), int(h/ratio)),
+            interpolation=cv2.INTER_AREA)
 
 def encode_segmentation(seg_dict, encode_dict):
   # Encode up to 8 segmentation images via bits of np.uint8
