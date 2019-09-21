@@ -164,7 +164,7 @@ BASE_LEARNING_RATE=0.007
 # ========================== SETTINGS (PATHS) ==========================
 
 # Init Models Paths
-# TF_INITIAL_CHECKPOINT="${WORK_DINIT_MODELS_DIRIR}/deeplabv3_pascal_train_aug/model.ckpt"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/deeplabv3_pascal_train_aug/model.ckpt"
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
