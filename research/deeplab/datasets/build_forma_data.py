@@ -87,11 +87,6 @@ tf.app.flags.DEFINE_string(
     './tfrecord',
     'Path to save converted SSTable of TensorFlow examples.')
 
-tf.app.flags.DEFINE_integer(
-    'dataset_size',
-    -1,
-    'Number of dataset elements.')
-
 
 _NUM_PER_SHARD = 500
 
@@ -117,8 +112,6 @@ fashion_names_to_bits = {item['name']: item['id'] for item in label_descriptions
 
 # max_h, max_w = 0, 0
 # filenames = sorted(os.listdir(DATA_DIR))
-# if FLAGS.dataset_size != -1:
-#   filenames = filenames[:FLAGS.dataset_size]
 # for filename in tqdm(filenames):
 #   json_filename = os.path.join(DATA_DIR, filename)
 #   example = load_dict_from_json(json_filename)
@@ -129,8 +122,6 @@ fashion_names_to_bits = {item['name']: item['id'] for item in label_descriptions
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
   filenames = sorted(os.listdir(data_dir))
-  if FLAGS.dataset_size != -1:
-    filenames = filenames[:FLAGS.dataset_size]
 
   train_split = int(0.8 * len(filenames))
   valid_split = int(0.9 * len(filenames))

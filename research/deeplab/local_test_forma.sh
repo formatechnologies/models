@@ -53,7 +53,6 @@ FINE_TUNE_BATCH_NORM=true
 
 # DATASET_NAME="imaterialist1k"
 # DEEPLAB_NAME="forma_1k"
-# DATASET_SIZE=1000
 # DATASET_TRAIN_SIZE=800
 # DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
 # NUM_CLASSES=9
@@ -64,7 +63,6 @@ FINE_TUNE_BATCH_NORM=true
 
 # DATASET_NAME="imaterialist1k"
 # DEEPLAB_NAME="forma_1k_3"
-# DATASET_SIZE=1000
 # DATASET_TRAIN_SIZE=800
 # NUM_CLASSES=3
 # EVAL_CROP_SIZE="1601,3313"
@@ -74,7 +72,6 @@ FINE_TUNE_BATCH_NORM=true
 
 # DATASET_NAME="imaterialist1k"
 # DEEPLAB_NAME="forma_1k_7"
-# DATASET_SIZE=1000
 # DATASET_TRAIN_SIZE=800
 # NUM_CLASSES=7
 # EVAL_CROP_SIZE="1601,3313"
@@ -84,7 +81,6 @@ FINE_TUNE_BATCH_NORM=true
 
 DATASET_NAME="imaterialist37k"
 DEEPLAB_NAME="forma_37k"
-DATASET_SIZE=-1
 DATASET_TRAIN_SIZE=29606
 NUM_CLASSES=9
 EVAL_CROP_SIZE="1601,3783"
@@ -94,7 +90,6 @@ SAVE_SUMMARIES_SECS=600
 
 # DATASET_NAME="imaterialist37k"
 # DEEPLAB_NAME="forma_37k_3"
-# DATASET_SIZE=-1
 # DATASET_TRAIN_SIZE=29606
 # NUM_CLASSES=3
 # EVAL_CROP_SIZE="1601,3783"
@@ -104,7 +99,6 @@ SAVE_SUMMARIES_SECS=600
 
 # DATASET_NAME="imaterialist37k"
 # DEEPLAB_NAME="forma_37k_7"
-# DATASET_SIZE=-1
 # DATASET_TRAIN_SIZE=29606
 # NUM_CLASSES=7
 # EVAL_CROP_SIZE="1601,3783"
@@ -193,14 +187,12 @@ EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 # TODO: make data input dir a TF flag
 # Build form data (from ~/storage/shared/datasets/json/train_json/)
 python3 ./datasets/build_forma_data.py \
-    --dataset_size=${DATASET_SIZE} \
     --output_dir="${DATASET_TFRECORD}" \
     --list_folder="${DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
 # Build form data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
 python3 ./datasets/build_human_parsing_data.py \
-    --dataset_size=${DATASET_SIZE} \
     --output_dir="${DATASET_TFRECORD2}" \
     --list_folder="${DATASET_SPLIT2}"
 

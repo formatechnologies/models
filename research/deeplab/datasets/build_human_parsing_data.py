@@ -91,11 +91,6 @@ tf.app.flags.DEFINE_string(
     './tfrecord',
     'Path to save converted SSTable of TensorFlow examples.')
 
-tf.app.flags.DEFINE_integer(
-    'dataset_size',
-    -1,
-    'Number of dataset elements.')
-
 
 _NUM_PER_SHARD = 500
 
@@ -132,8 +127,6 @@ human_parsing_machine = HumanParsingMachine()
 
 # max_h, max_w = 0, 0
 # filenames = sorted(os.listdir(HUMAN_PARSING_IMAGE_DIR))
-# if FLAGS.dataset_size != -1:
-#   filenames = filenames[:FLAGS.dataset_size]
 # for filename in tqdm(filenames):
 #   json_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filename)
 #   example = load_dict_from_json(json_filename)
@@ -145,8 +138,6 @@ human_parsing_machine = HumanParsingMachine()
 def _create_dataset_splits(data_dir, dataset_split_dir):
   filenames = sorted(os.listdir(data_dir))
   filenames = [os.path.splitext(filename)[0] for filename in filenames]
-  if FLAGS.dataset_size != -1:
-    filenames = filenames[:FLAGS.dataset_size]
 
   random.shuffle(filenames)
   train_split = int(0.8 * len(filenames))
