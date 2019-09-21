@@ -52,10 +52,10 @@ FINE_TUNE_BATCH_NORM=true
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
 
 DATASET_NAME="imaterialist37k"
-DEEPLAB_NAME="forma_37k"
 NUM_CLASSES=9
 EVAL_CROP_SIZE="1601,3783"
 DATASET_TRAIN_SIZE=29606
+
 NUM_EPOCHS=20
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
 NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
@@ -142,7 +142,7 @@ EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 
 # TODO: make data input dir a TF flag
 # Build form data (from ~/storage/shared/datasets/json/train_json/)
-python3 ./datasets/build_forma_data.py \
+python3 ./datasets/build_imaterialist_data.py \
     --output_dir="${DATASET_TFRECORD}" \
     --list_folder="${DATASET_SPLIT}"
 
@@ -171,7 +171,7 @@ python3 ./train.py \
   --tf_initial_checkpoint="${TF_INITIAL_CHECKPOINT}" \
   --initialize_last_layer=${INITIALIZE_LAST_LAYERS} \
   --last_layers_contain_logits_only=${LAST_LAYERS_CONTAINS_LOGITS_ONLY} \
-  --dataset="${DEEPLAB_NAME}" \
+  --dataset="${DATASET_NAME}" \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${DATASET_TFRECORD}" \
   --save_interaval_secs="${SAVE_INTERVAL_SECS}" \
@@ -191,7 +191,7 @@ python3 ./eval.py \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --eval_crop_size="${EVAL_CROP_SIZE}" \
-  --dataset="${DEEPLAB_NAME}" \
+  --dataset="${DATASET_NAME}" \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --eval_logdir="${EVAL_LOGDIR}" \
   --dataset_dir="${DATASET_TFRECORD}" \
@@ -208,7 +208,7 @@ python3 ./vis.py \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --vis_crop_size="${EVAL_CROP_SIZE}" \
-  --dataset="${DEEPLAB_NAME}" \
+  --dataset="${DATASET_NAME}" \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --vis_logdir="${VIS_LOGDIR}" \
   --dataset_dir="${DATASET_TFRECORD}" \

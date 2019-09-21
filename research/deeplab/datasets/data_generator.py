@@ -96,7 +96,7 @@ _ADE20K_INFORMATION = DatasetDescriptor(
     ignore_label=0,
 )
 
-_FORMA_37K_INFORMATION = DatasetDescriptor(
+_IMATERIALIST37K_INFORMATION = DatasetDescriptor(
     splits_to_sizes={
         'train': 29606,
         # 'train_aug': 10582,
@@ -111,7 +111,7 @@ _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
     'pascal_voc_seg': _PASCAL_VOC_SEG_INFORMATION,
     'ade20k': _ADE20K_INFORMATION,
-    'forma_37k': _FORMA_37K_INFORMATION,
+    'imaterialist37k': _IMATERIALIST37K_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
