@@ -92,11 +92,6 @@ tf.app.flags.DEFINE_integer(
     -1,
     'Number of dataset elements.')
 
-tf.app.flags.DEFINE_string(
-    'seg_encoding_type',
-    'seg_name_to_label',
-    'Type of segmentation encoding.')
-
 
 _NUM_PER_SHARD = 500
 
@@ -114,28 +109,6 @@ seg_name_to_label = {
   'seg_shoe': 6,
   'seg_sleeves': 7,
   'seg_pants': 8,
-}
-
-seg_name_to_label_7 = {
-  'seg_background': 0,
-  'seg_body': 1,
-  'seg_garment': 2,
-  'seg_skin': 3,
-  'seg_hair': 4,
-  'seg_arms': 5,
-  'seg_shoe': 6,
-}
-
-seg_name_to_label_3 = {
-  'seg_background': 0,
-  'seg_sleeves': 1,
-  'seg_pants': 2,
-}
-
-SEG_ENCODING_TYPES = {
-  'seg_name_to_label': seg_name_to_label,
-  'seg_name_to_label_7': seg_name_to_label_7,
-  'seg_name_to_label_3': seg_name_to_label_3,
 }
 
 with open(LABELS_FILE, 'r') as f:
@@ -214,11 +187,11 @@ def _convert_dataset(dataset_split):
 
         # Read the semantic segmentation annotation.
         fashion_dict = decode_segmentation(example['seg_fashion_parsing'], fashion_names_to_bits)
-        seg_dict = {k: v for k, v in example.items() if k in SEG_ENCODING_TYPES[FLAGS.seg_encoding_type]}
+        seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
         seg_dict['seg_sleeves'] = fashion_dict['sleeve']
         seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
         seg_dict['seg_background'] = get_seg_background(seg_dict)
-        seg = encode_segmentation_exclusive(seg_dict, SEG_ENCODING_TYPES[FLAGS.seg_encoding_type])
+        seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
         seg = seg[:, :, np.newaxis].repeat(3, axis=2)
         seg_data = to_image_bytestring(seg, '.png')
         seg_height, seg_width = seg.shape[:2]
