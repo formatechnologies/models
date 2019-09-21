@@ -128,9 +128,9 @@ human_parsing_machine = HumanParsingMachine()
 # max_h, max_w = 0, 0
 # filenames = sorted(os.listdir(HUMAN_PARSING_IMAGE_DIR))
 # for filename in tqdm(filenames):
-#   json_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filename)
-#   example = load_dict_from_json(json_filename)
-#   h, w, _ = example['image'].shape
+#   image_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filename)
+#   image = cv2.imread(image_filename)
+#   h, w, _ = image.shape
 #   max_h = max(max_h, h)
 #   max_w = max(max_w, w)
 # print(max_h, max_w)

@@ -99,9 +99,18 @@ _ADE20K_INFORMATION = DatasetDescriptor(
 _IMATERIALIST37K_INFORMATION = DatasetDescriptor(
     splits_to_sizes={
         'train': 29606,
-        # 'train_aug': 10582,
         'trainval': 3701,
         'val': 3701,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
+_HUMAN_PARSING_17K = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 14164,
+        'trainval': 1771,
+        'val': 1771,
     },
     num_classes=9,
     ignore_label=255,
@@ -112,6 +121,7 @@ _DATASETS_INFORMATION = {
     'pascal_voc_seg': _PASCAL_VOC_SEG_INFORMATION,
     'ade20k': _ADE20K_INFORMATION,
     'imaterialist37k': _IMATERIALIST37K_INFORMATION,
+    'humanparsing17k': _HUMAN_PARSING_17K,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
