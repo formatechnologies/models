@@ -145,16 +145,19 @@ EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 # ========================== SETTINGS (END) ==========================
 
 # TODO: make data input dir a TF flag
-# Build form data (from ~/storage/shared/datasets/json/train_json/)
+# Build imaterialist data (from ~/storage/shared/datasets/json/train_json/)
 python3 ./datasets/build_imaterialist_data.py \
     --output_dir="${DATASET_TFRECORD}" \
     --list_folder="${DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
-# Build form data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
+# Build human_parsing data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
 python3 ./datasets/build_human_parsing_data.py \
     --output_dir="${DATASET_TFRECORD2}" \
     --list_folder="${DATASET_SPLIT2}"
+
+# Build forma data (by combining all datasets)
+python3 ./datasets/build_forma_data.py
 
 # Train.
 python3 ./train.py \
