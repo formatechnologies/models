@@ -157,12 +157,14 @@ https://docs.google.com/spreadsheets/d/19kLXbGjNFdv_5w-_VDh-6GdO6R-RJBzglAc73SaY
 
 * training_number_of_steps
 * learning_policy
+  * use 'step' (exponential decay) for training
+  * use 'poly' (polynomial decay) for finetuning
 * base_learning_rate
-  * use 0.007 for initially training
+  * use 0.007 for training
   * use 0.0001 for finetuning
-* learning_rate_decay_factor
-* learning_rate_decay_step
-* learning_power
+* learning_rate_decay_factor (for 'step' learning policy)
+* learning_rate_decay_step (for 'step' learning policy)
+* learning_power (for 'polynomial' learning policy)
 * momentum
 * weight_decay
 
