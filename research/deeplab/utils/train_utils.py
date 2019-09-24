@@ -268,7 +268,7 @@ def get_model_learning_rate(learning_policy,
         adjusted_global_step,
         learning_rate_decay_step,
         learning_rate_decay_factor,
-        staircase=True)
+        staircase=False)
   elif learning_policy == 'poly':
     learning_rate = tf.train.polynomial_decay(
         base_learning_rate,
