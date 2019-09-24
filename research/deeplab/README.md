@@ -1,6 +1,85 @@
+# Usage
+
+## Install
+
+```
+cd ~
+mkdir tensorflow
+cd tensorflow
+git clone git@github.com:formatechnologies/models.git
+
+```
+
+Test to see if the Pascal VOC pretrained model runs:
+```
+cd ~/tensorflow/models/research/deeplab
+sh local_test.sh
+```
+
+## Dataset Creation
+
+If creating a custom dataset:
+1. Read http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
+1. Copy a `datasets/build_XXX_data.py` script to create TFRecords
+1. Add a `DatasetDescriptor` in `datasets/data_generator.py`
+1. (Optional) Add a label colormap in `utils/get_dataset_colormap.py`
+1. Modify `local_test_forma.sh` to call `python3 datasets/build_XXX_data.py` to build dataset
+1. Modify `local_test_forma.sh` with the correct `DATASET_NAME` and other parameters for training
+1. (Optional) Add this dataset to `Forma54k` in `datasets/build_forma_data.py`
+
+## Training
+
+```
+cd ~/tensorflow/models/research/deeplab
+sh local_test_forma.sh
+
+tensorboard --logdir=~/storage/shared/deeplab/experiments
+```
+
+This will use the `~/storage/shared/deeplab` folder, which contains the following:
+
+- `~/storage/shared/deeplab/datasets`: stores datasets as TFRecord
+- `~/storage/shared/deeplab/init_models`: stores some pretrained models for initialization
+- `~/storage/shared/deeplab/experiments`: stores all experiment output
+
+The settings in `local_test_forma.sh` are by default for GPU 1 and GPU 2:
+```
+ssh -XC dennis@192.168.16.140 #gpu1-workstation
+ssh -XC dennis@192.168.16.150 #gpu2-workstation
+```
+
+If running on a local machine, be sure to change to using only a single GPU in `local_test_forma.sh`:
+```
+# ========================== SETTINGS (WORKSTATION) ==========================
+
+# Dennis Workstation Settings
+export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
+NUM_CLONES=1
+TRAIN_BATCH_SIZE=1
+FINE_TUNE_BATCH_NORM=false
+
+# GPU 1 + GPU 2 Workstation Settings
+# NUM_CLONES=8
+# TRAIN_BATCH_SIZE=8
+# FINE_TUNE_BATCH_NORM=false
+
+# NUM_CLONES=4  # Don't use 8, draws too much power
+# TRAIN_BATCH_SIZE=16
+# FINE_TUNE_BATCH_NORM=true
+```
+
+Please see all DeepLab V3+ Hyperparameters described below, in `local_test_forma.sh`, and in the code
+(`train.py`, `eval.py`, `vis.py`, `export_model.py`) before training.
+
 # DeepLab V3+ Hyperparameters
 
+See hyperparameters tradeoffs here:
+
 https://arxiv.org/pdf/1706.05587.pdf
+
+See some training history here:
+
+https://docs.google.com/spreadsheets/d/19kLXbGjNFdv_5w-_VDh-6GdO6R-RJBzglAc73SaYcjs/edit?usp=sharing
 
 ## Build Forma Data
 
