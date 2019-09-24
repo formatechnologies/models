@@ -41,7 +41,7 @@ EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 echo "BUILD DATASET (IMATERIALIST37K)"
 
 IMATERIALIST_DATASET_NAME="imaterialist37k"
-IMATERIALIST_EVAL_CROP_SIZE="1601,3783"
+IMATERIALIST_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
 IMATERIALIST_DATASET_TRAIN_SIZE=29606
 
 IMATERIALIST_DATASET_DIR="${DATASETS_DIR}/${IMATERIALIST_DATASET_NAME}"
@@ -61,7 +61,7 @@ python3 ./datasets/build_imaterialist_data.py \
 echo "BUILD DATASET (HUMANPARSING17K)"
 
 HUMANPARSING_DATASET_NAME='humanparsing17k'
-HUMANPARSING_EVAL_CROP_SIZE="1601,1137"
+HUMANPARSING_EVAL_CROP_SIZE="1601,1137" # Max image dimensions + 1
 HUMANPARSING_DATASET_TRAIN_SIZE=14164
 
 HUMANPARSING_DATASET_DIR="${DATASETS_DIR}/${HUMANPARSING_DATASET_NAME}"
@@ -81,7 +81,7 @@ python3 ./datasets/build_human_parsing_data.py \
 echo "BUILD DATASET (FORMA54K)"
 
 FORMA_DATASET_NAME='forma54k'
-FORMA_EVAL_CROP_SIZE="1601,3783"
+FORMA_EVAL_CROP_SIZE="1601,3783"   # Max image dimensions + 1
 FORMA_DATASET_TRAIN_SIZE=43770
 
 FORMA_DATASET_DIR="${DATASETS_DIR}/${FORMA_DATASET_NAME}"
@@ -96,7 +96,6 @@ mkdir -p "${FORMA_DATASET_SPLIT}"
 python3 ./datasets/build_forma_data.py
 
 # ========================== SETTINGS (WORKSTATION) ==========================
-
 # # Dennis Workstation Settings
 # export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
 # NUM_CLONES=1
@@ -136,6 +135,18 @@ DATASET_DIR=$FORMA_DATASET_DIR
 DATASET_TFRECORD=$FORMA_DATASET_TFRECORD
 DATASET_SPLIT=$FORMA_DATASET_SPLIT
 
+# ========================== SETTINGS (INITIALIZATION) ==========================
+# Init Models Paths
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/deeplabv3_pascal_train_aug/model.ckpt"
+# INITIALIZE_LAST_LAYERS=false
+# LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
+
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k/model.ckpt-740000"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-366824"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-693543"
+INITIALIZE_LAST_LAYERS=true
+LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
+
 # ========================== SETTINGS (LEARNING POLICY) ==========================
 NUM_EPOCHS=20
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
@@ -155,10 +166,11 @@ LEARNING_POWER=0                # unused
 # LEARNING_RATE_DECAY_STEP=0    # unused
 # LEARNING_POWER=0.9
 
+# ========================== SETTINGS (LOGGING) ==========================
 SAVE_INTERVAL_SECS=1200
 SAVE_SUMMARIES_SECS=600
-# ========================== SETTINGS (MODEL) ==========================
 
+# ========================== SETTINGS (MODEL) ==========================
 OUTPUT_STRIDE=16
 ATROUS_RATE_1=6
 ATROUS_RATE_2=12
@@ -174,18 +186,6 @@ MODEL_VARIANT="xception_65"
 DECODER_OUTPUT_STRIDE=4
 
 # ========================== SETTINGS (PATHS) ==========================
-
-# Init Models Paths
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/deeplabv3_pascal_train_aug/model.ckpt"
-# INITIALIZE_LAST_LAYERS=false
-# LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
-
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k/model.ckpt-740000"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-366824"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-693543"
-INITIALIZE_LAST_LAYERS=true
-LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
-
 # Experiment Paths
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
