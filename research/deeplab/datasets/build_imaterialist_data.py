@@ -59,16 +59,12 @@ import tensorflow as tf
 import glob
 import json
 from tqdm import tqdm
-import random
-random.seed(0)
 
 import numpy as np
 import cv2
 
 from utility.paths import STORAGE_DIR
 from utility.json_tools import load_dict_from_json
-
-from deeplab_model.deeplab import HumanParsingMachine
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -95,13 +91,8 @@ tf.app.flags.DEFINE_string(
 _NUM_PER_SHARD = 500
 
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
-
-IMATERLIAST_DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
-IMATERIALIST_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
-
-HUMAN_PARSING_IMAGE_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/JPEGImages/')
-HUMAN_PARSING_LABEL_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/SegmentationClassAug/')
-HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/atr_label.txt')
+DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
+LABELS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
 
 seg_name_to_label = {
   'seg_background': 0,
@@ -115,31 +106,23 @@ seg_name_to_label = {
   'seg_pants': 8,
 }
 
-with open(IMATERIALIST_LABEL_DESCRIPTIONS_FILE, 'r') as f:
+with open(LABELS_FILE, 'r') as f:
   label_descriptions = json.load(f)
-imaterialist_labels_to_numbers = {item['name']: item['id'] for item in label_descriptions['categories']}
-
-with open(HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE, 'r') as f:
-  lines = [line.strip().split(' ') for line in f.readlines()]
-human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
-
-human_parsing_machine = HumanParsingMachine()
+fashion_names_to_bits = {item['name']: item['id'] for item in label_descriptions['categories']}
 
 # max_h, max_w = 0, 0
-# filenames = sorted(os.listdir(HUMAN_PARSING_IMAGE_DIR))
+# filenames = sorted(os.listdir(DATA_DIR))
 # for filename in tqdm(filenames):
-#   image_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, filename)
-#   image = cv2.imread(image_filename)
-#   h, w, _ = image.shape
+#   json_filename = os.path.join(DATA_DIR, filename)
+#   example = load_dict_from_json(json_filename)
+#   h, w, _ = example['image'].shape
 #   max_h = max(max_h, h)
 #   max_w = max(max_w, w)
 # print(max_h, max_w)
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
   filenames = sorted(os.listdir(data_dir))
-  filenames = [os.path.splitext(filename)[0] for filename in filenames]
 
-  random.shuffle(filenames)
   train_split = int(0.8 * len(filenames))
   valid_split = int(0.9 * len(filenames))
 
@@ -187,44 +170,18 @@ def _convert_dataset(dataset_split):
       end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
       for i in tqdm(range(start_idx, end_idx)):
         # Read the image.
-        image_filename = os.path.join(HUMAN_PARSING_IMAGE_DIR, f'{filenames[i]}.jpg')
-        image = cv2.imread(image_filename)
+        json_filename = os.path.join(DATA_DIR, filenames[i])
+        example = load_dict_from_json(json_filename)
+        image = example['image']
         image_data = to_image_bytestring(image, '.jpg')
         height, width = image.shape[:2]
 
         # Read the semantic segmentation annotation.
-        seg_filename = os.path.join(HUMAN_PARSING_LABEL_DIR, f'{filenames[i]}.png')
-        seg = cv2.imread(seg_filename)
-        example = decode_segmentation_exclusive(seg, human_parsing_labels_to_numbers)
-        example = {k: v[:, :, 0] for k, v in example.items()}
-
-        def multi_max(dct, lst):
-          max_mask = dct[lst[0]]
-          for i in range(1, len(lst)):
-            max_mask = np.maximum(max_mask, dct[lst[i]])
-          return max_mask
-
-        seg_dict = {}
-        seg_dict['seg_background'] = multi_max(example, ['background'])
-        seg_dict['seg_body'] = multi_max(example, ['hat', 'sunglass', 'bag'])  # 255 - example['background']
-        seg_dict['seg_garment'] = multi_max(example, ['upper-clothes', 'dress', 'skirt', 'pants', 'belt', 'scarf'])
-        seg_dict['seg_skin'] = multi_max(example, ['face', 'left-leg', 'right-leg'])
-        seg_dict['seg_hair'] = multi_max(example, ['hair'])
-        seg_dict['seg_arms'] = multi_max(example, ['left-arm', 'right-arm'])
-        seg_dict['seg_shoe'] = multi_max(example, ['left-shoe', 'right-shoe'])
-
-        image_ds = reduce_image_size2(image, max_height=1000, max_width=1000)
-        example = human_parsing_machine.run(image_ds)
-        if image_ds.shape != image.shape:
-          example = {k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST) for k, v in example.items()}
-        seg_dict['seg_sleeves'] = example['seg_sleeves']
-        seg_dict['seg_pants'] = example['seg_pants']
-
-        # fashion_dict = decode_segmentation(example['seg_fashion_parsing'], imaterialist_labels_to_numbers)
-        # seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
-        # seg_dict['seg_sleeves'] = fashion_dict['sleeve']
-        # seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
-        # seg_dict['seg_background'] = get_seg_background(seg_dict)
+        fashion_dict = decode_segmentation(example['seg_fashion_parsing'], fashion_names_to_bits)
+        seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
+        seg_dict['seg_sleeves'] = fashion_dict['sleeve']
+        seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
+        seg_dict['seg_background'] = get_seg_background(seg_dict)
         seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
         seg = seg[:, :, np.newaxis].repeat(3, axis=2)
         seg_data = to_image_bytestring(seg, '.png')
@@ -237,20 +194,6 @@ def _convert_dataset(dataset_split):
         example = build_data.image_seg_to_tfexample(
             image_data, filenames[i], height, width, seg_data)
         tfrecord_writer.write(example.SerializeToString())
-
-def reduce_image_size2(image, max_height=1000, max_width=1000):
-    """
-    Reduce an numpy array image to a certain max size
-    """
-    h, w, _ = image.shape
-
-    ratio_h = h / max_height
-    ratio_w = w / max_width
-    ratio = max(ratio_h, ratio_w)
-    if ratio < 1:
-        return image
-    return cv2.resize(image, (int(w/ratio), int(h/ratio)),
-            interpolation=cv2.INTER_AREA)
 
 def encode_segmentation(seg_dict, encode_dict):
   # Encode up to 8 segmentation images via bits of np.uint8
@@ -304,7 +247,7 @@ def get_seg_background(seg_dict):
   return image
 
 def main(unused_argv):
-  _create_dataset_splits(HUMAN_PARSING_IMAGE_DIR, FLAGS.list_folder)
+  _create_dataset_splits(DATA_DIR, FLAGS.list_folder)
   dataset_splits = sorted(tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt')))
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)

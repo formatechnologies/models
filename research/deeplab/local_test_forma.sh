@@ -31,6 +31,70 @@ cd ..
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 cd deeplab
 
+# Deeplab Path
+DEEPLAB_DIR="${HOME}/storage/shared/deeplab"
+INIT_MODELS_DIR="${DEEPLAB_DIR}/init_models"
+DATASETS_DIR="${DEEPLAB_DIR}/datasets"
+EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
+
+# ========================== BUILD DATASET (IMATERIALIST37K) ==========================
+echo "BUILD DATASET (IMATERIALIST37K)"
+
+IMATERIALIST_DATASET_NAME="imaterialist37k"
+IMATERIALIST_EVAL_CROP_SIZE="1601,3783"
+IMATERIALIST_DATASET_TRAIN_SIZE=29606
+
+IMATERIALIST_DATASET_DIR="${DATASETS_DIR}/${IMATERIALIST_DATASET_NAME}"
+IMATERIALIST_DATASET_TFRECORD="${IMATERIALIST_DATASET_DIR}/tfrecord"
+IMATERIALIST_DATASET_SPLIT="${IMATERIALIST_DATASET_DIR}/dataset_split"
+mkdir -p "${IMATERIALIST_DATASET_DIR}"
+mkdir -p "${IMATERIALIST_DATASET_TFRECORD}"
+mkdir -p "${IMATERIALIST_DATASET_SPLIT}"
+
+# TODO: make data input dir a TF flag
+# Build imaterialist data (from ~/storage/shared/datasets/json/train_json/)
+python3 ./datasets/build_imaterialist_data.py \
+    --output_dir="${IMATERIALIST_DATASET_TFRECORD}" \
+    --list_folder="${IMATERIALIST_DATASET_SPLIT}"
+
+# ========================== BUILD DATASET (HUMANPARSING17K) ==========================
+echo "BUILD DATASET (HUMANPARSING17K)"
+
+HUMANPARSING_DATASET_NAME='humanparsing17k'
+HUMANPARSING_EVAL_CROP_SIZE="1601,1137"
+HUMANPARSING_DATASET_TRAIN_SIZE=14164
+
+HUMANPARSING_DATASET_DIR="${DATASETS_DIR}/${HUMANPARSING_DATASET_NAME}"
+HUMANPARSING_DATASET_TFRECORD="${HUMANPARSING_DATASET_DIR}/tfrecord"
+HUMANPARSING_DATASET_SPLIT="${HUMANPARSING_DATASET_DIR}/dataset_split"
+mkdir -p "${HUMANPARSING_DATASET_DIR}"
+mkdir -p "${HUMANPARSING_DATASET_TFRECORD}"
+mkdir -p "${HUMANPARSING_DATASET_SPLIT}"
+
+# TODO: make data input dir a TF flag
+# Build human_parsing data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
+python3 ./datasets/build_human_parsing_data.py \
+    --output_dir="${HUMANPARSING_DATASET_TFRECORD}" \
+    --list_folder="${HUMANPARSING_DATASET_SPLIT}"
+
+# ========================== BUILD DATASET (FORMA54K) ==========================
+echo "BUILD DATASET (FORMA54K)"
+
+FORMA_DATASET_NAME='forma54k'
+FORMA_EVAL_CROP_SIZE="1601,3783"
+FORMA_DATASET_TRAIN_SIZE=43770
+
+FORMA_DATASET_DIR="${DATASETS_DIR}/${FORMA_DATASET_NAME}"
+FORMA_DATASET_TFRECORD="${FORMA_DATASET_DIR}/tfrecord"
+FORMA_DATASET_SPLIT="${FORMA_DATASET_DIR}/dataset_split"
+mkdir -p "${FORMA_DATASET_DIR}"
+mkdir -p "${FORMA_DATASET_TFRECORD}"
+mkdir -p "${FORMA_DATASET_SPLIT}"
+
+# TODO: make data input dir a TF flag
+# Build forma data (by combining all datasets)
+python3 ./datasets/build_forma_data.py
+
 # ========================== SETTINGS (WORKSTATION) ==========================
 
 # # Dennis Workstation Settings
@@ -51,101 +115,68 @@ FINE_TUNE_BATCH_NORM=true
 # ========================== SETTINGS (DATASET) ==========================
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
 
-# DATASET_NAME="imaterialist1k"
-# DEEPLAB_NAME="forma_1k"
-# DATASET_SIZE=1000
-# DATASET_TRAIN_SIZE=800
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
-# NUM_CLASSES=9
-# EVAL_CROP_SIZE="1601,3313"
-# NUM_EPOCHS=20
-# SAVE_INTERVAL_SECS=120
-# SAVE_SUMMARIES_SECS=120
+# DATASET_NAME=$IMATERIALIST_DATASET_NAME
+# EVAL_CROP_SIZE=$IMATERIALIST_EVAL_CROP_SIZE
+# DATASET_TRAIN_SIZE=$IMATERIALIST_DATASET_TRAIN_SIZE
+# DATASET_DIR=$IMATERIALIST_DATASET_DIR
+# DATASET_TFRECORD=$IMATERIALIST_DATASET_TFRECORD
+# DATASET_SPLIT=$IMATERIALIST_DATASET_SPLIT
 
-# DATASET_NAME="imaterialist1k"
-# DEEPLAB_NAME="forma_1k_3"
-# DATASET_SIZE=1000
-# DATASET_TRAIN_SIZE=800
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
-# NUM_CLASSES=3
-# EVAL_CROP_SIZE="1601,3313"
-# NUM_EPOCHS=20
-# SAVE_INTERVAL_SECS=120
-# SAVE_SUMMARIES_SECS=120
+# DATASET_NAME=$HUMANPARSING_DATASET_NAME
+# EVAL_CROP_SIZE=$HUMANPARSING_EVAL_CROP_SIZE
+# DATASET_TRAIN_SIZE=$HUMANPARSING_DATASET_TRAIN_SIZE
+# DATASET_DIR=$HUMANPARSING_DATASET_DIR
+# DATASET_TFRECORD=$HUMANPARSING_DATASET_TFRECORD
+# DATASET_SPLIT=$HUMANPARSING_DATASET_SPLIT
 
-# DATASET_NAME="imaterialist1k"
-# DEEPLAB_NAME="forma_1k_7"
-# DATASET_SIZE=1000
-# DATASET_TRAIN_SIZE=800
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
-# NUM_CLASSES=7
-# EVAL_CROP_SIZE="1601,3313"
-# NUM_EPOCHS=20
-# SAVE_INTERVAL_SECS=120
-# SAVE_SUMMARIES_SECS=120
+DATASET_NAME=$FORMA_DATASET_NAME
+EVAL_CROP_SIZE=$FORMA_EVAL_CROP_SIZE
+DATASET_TRAIN_SIZE=$FORMA_DATASET_TRAIN_SIZE
+DATASET_DIR=$FORMA_DATASET_DIR
+DATASET_TFRECORD=$FORMA_DATASET_TFRECORD
+DATASET_SPLIT=$FORMA_DATASET_SPLIT
 
-DATASET_NAME="imaterialist37k"
-DEEPLAB_NAME="forma_37k"
-DATASET_SIZE=-1
-DATASET_TRAIN_SIZE=29606
-DATASET_SEG_ENCODING_TYPE='seg_name_to_label'
-NUM_CLASSES=9
-EVAL_CROP_SIZE="1601,3783"
+# ========================== SETTINGS (LEARNING POLICY) ==========================
 NUM_EPOCHS=20
-SAVE_INTERVAL_SECS=1200
-SAVE_SUMMARIES_SECS=600
-
-# DATASET_NAME="imaterialist37k"
-# DEEPLAB_NAME="forma_37k_3"
-# DATASET_SIZE=-1
-# DATASET_TRAIN_SIZE=29606
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_3'
-# NUM_CLASSES=3
-# EVAL_CROP_SIZE="1601,3783"
-# NUM_EPOCHS=20
-# SAVE_INTERVAL_SECS=1200
-# SAVE_SUMMARIES_SECS=600
-
-# DATASET_NAME="imaterialist37k"
-# DEEPLAB_NAME="forma_37k_7"
-# DATASET_SIZE=-1
-# DATASET_TRAIN_SIZE=29606
-# DATASET_SEG_ENCODING_TYPE='seg_name_to_label_7'
-# NUM_CLASSES=7
-# EVAL_CROP_SIZE="1601,3783"
-# NUM_EPOCHS=20
-# SAVE_INTERVAL_SECS=1200
-# SAVE_SUMMARIES_SECS=600
-
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
 NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
 
+# Initial Training
+LEARNING_POLICY="poly"
+BASE_LEARNING_RATE=0.007
+LEARNING_RATE_DECAY_FACTOR=0.1
+LEARNING_RATE_DECAY_STEP=`expr $NUM_ITERATIONS / 2`  # Decay to 0.1^2 * BASE_LEARNING_RATE
+LEARNING_POWER=0                # unused
+
+# # Fine-tuning
+# LEARNING_POLICY="step"
+# BASE_LEARNING_RATE=0.0001
+# LEARNING_RATE_DECAY_FACTOR=0  # unused
+# LEARNING_RATE_DECAY_STEP=0    # unused
+# LEARNING_POWER=0.9
+
+SAVE_INTERVAL_SECS=1200
+SAVE_SUMMARIES_SECS=600
+# ========================== SETTINGS (MODEL) ==========================
+
+OUTPUT_STRIDE=16
 ATROUS_RATE_1=6
 ATROUS_RATE_2=12
 ATROUS_RATE_3=18
-OUTPUT_STRIDE=16
 
+# OUTPUT_STRIDE=8
 # ATROUS_RATE_1=12
 # ATROUS_RATE_2=24
 # ATROUS_RATE_3=36
-# OUTPUT_STRIDE=8
 
 EVAL_OUTPUT_STRIDE=8
 MODEL_VARIANT="xception_65"
 DECODER_OUTPUT_STRIDE=4
 
-BASE_LEARNING_RATE=0.007
-
 # ========================== SETTINGS (PATHS) ==========================
 
-# Deeplab Path
-DEEPLAB_DIR="${HOME}/storage/shared/deeplab"
-INIT_MODELS_DIR="${DEEPLAB_DIR}/init_models"
-DATASETS_DIR="${DEEPLAB_DIR}/datasets"
-EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
-
 # Init Models Paths
-# TF_INITIAL_CHECKPOINT="${WORK_DINIT_MODELS_DIRIR}/deeplabv3_pascal_train_aug/model.ckpt"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/deeplabv3_pascal_train_aug/model.ckpt"
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
@@ -154,22 +185,6 @@ EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/imaterialist37k_augmented/model.ckpt-693543"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
-
-# Dataset Paths
-DATASET_DIR="${DATASETS_DIR}/${DATASET_NAME}"
-DATASET_TFRECORD="${DATASET_DIR}/tfrecord"
-DATASET_SPLIT="${DATASET_DIR}/dataset_split"
-mkdir -p "${DATASET_DIR}"
-mkdir -p "${DATASET_TFRECORD}"
-mkdir -p "${DATASET_SPLIT}"
-
-DATASET_NAME2='humanparsing17k'
-DATASET_DIR2="${DATASETS_DIR}/${DATASET_NAME2}"
-DATASET_TFRECORD2="${DATASET_DIR2}/tfrecord"
-DATASET_SPLIT2="${DATASET_DIR2}/dataset_split"
-mkdir -p "${DATASET_DIR2}"
-mkdir -p "${DATASET_TFRECORD2}"
-mkdir -p "${DATASET_SPLIT2}"
 
 # Experiment Paths
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
@@ -195,22 +210,6 @@ EXPORT_PATH="${EXPORT_DIR}/frozen_inference_graph.pb"
 
 # ========================== SETTINGS (END) ==========================
 
-# TODO: make data input dir a TF flag
-# Build form data (from ~/storage/shared/datasets/json/train_json/)
-python3 ./datasets/build_forma_data.py \
-    --dataset_size=${DATASET_SIZE} \
-    --dataset_seg_encoding_type="${DATASET_SEG_ENCODING_TYPE}" \
-    --output_dir="${DATASET_TFRECORD}" \
-    --list_folder="${DATASET_SPLIT}"
-
-# TODO: make data input dir a TF flag
-# Build form data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
-python3 ./datasets/build_human_parsing_data.py \
-    --dataset_size=${DATASET_SIZE} \
-    --dataset_seg_encoding_type="${DATASET_SEG_ENCODING_TYPE}" \
-    --output_dir="${DATASET_TFRECORD2}" \
-    --list_folder="${DATASET_SPLIT2}"
-
 # Train.
 python3 ./train.py \
   --logtostderr \
@@ -225,12 +224,16 @@ python3 ./train.py \
   --num_clones=${NUM_CLONES} \
   --train_batch_size=${TRAIN_BATCH_SIZE} \
   --training_number_of_steps="${NUM_ITERATIONS}" \
+  --learning_policy="${LEARNING_POLICY}" \
   --base_learning_rate=${BASE_LEARNING_RATE} \
+  --learning_rate_decay_factor=${LEARNING_RATE_DECAY_FACTOR} \
+  --learning_rate_decay_step=${LEARNING_RATE_DECAY_STEP} \
+  --learning_power=${LEARNING_POWER} \
   --fine_tune_batch_norm=${FINE_TUNE_BATCH_NORM} \
   --tf_initial_checkpoint="${TF_INITIAL_CHECKPOINT}" \
   --initialize_last_layer=${INITIALIZE_LAST_LAYERS} \
   --last_layers_contain_logits_only=${LAST_LAYERS_CONTAINS_LOGITS_ONLY} \
-  --dataset="${DEEPLAB_NAME}" \
+  --dataset="${DATASET_NAME}" \
   --train_logdir="${TRAIN_LOGDIR}" \
   --dataset_dir="${DATASET_TFRECORD}" \
   --save_interaval_secs="${SAVE_INTERVAL_SECS}" \
@@ -250,7 +253,7 @@ python3 ./eval.py \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --eval_crop_size="${EVAL_CROP_SIZE}" \
-  --dataset="${DEEPLAB_NAME}" \
+  --dataset="${DATASET_NAME}" \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --eval_logdir="${EVAL_LOGDIR}" \
   --dataset_dir="${DATASET_TFRECORD}" \
@@ -267,7 +270,7 @@ python3 ./vis.py \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --vis_crop_size="${EVAL_CROP_SIZE}" \
-  --dataset="${DEEPLAB_NAME}" \
+  --dataset="${DATASET_NAME}" \
   --checkpoint_dir="${TRAIN_LOGDIR}" \
   --vis_logdir="${VIS_LOGDIR}" \
   --dataset_dir="${DATASET_TFRECORD}" \
@@ -285,7 +288,7 @@ python3 ./export_model.py \
   --atrous_rates=${ATROUS_RATE_3} \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
-  --num_classes="${NUM_CLASSES}" \
+  --num_classes="9" \
   --crop_size=1001 \
   --crop_size=1001 \
   --inference_scales=1.0
