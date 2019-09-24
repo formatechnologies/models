@@ -136,12 +136,28 @@ DATASET_DIR=$FORMA_DATASET_DIR
 DATASET_TFRECORD=$FORMA_DATASET_TFRECORD
 DATASET_SPLIT=$FORMA_DATASET_SPLIT
 
+# ========================== SETTINGS (LEARNING POLICY) ==========================
 NUM_EPOCHS=20
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
 NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
 
+# Initial Training
+LEARNING_POLICY="poly"
+BASE_LEARNING_RATE=0.007
+LEARNING_RATE_DECAY_FACTOR=0.1
+LEARNING_RATE_DECAY_STEP=`expr $NUM_ITERATIONS / 2`  # Decay to 0.1^2 * BASE_LEARNING_RATE
+LEARNING_POWER=0                # unused
+
+# # Fine-tuning
+# LEARNING_POLICY="step"
+# BASE_LEARNING_RATE=0.0001
+# LEARNING_RATE_DECAY_FACTOR=0  # unused
+# LEARNING_RATE_DECAY_STEP=0    # unused
+# LEARNING_POWER=0.9
+
 SAVE_INTERVAL_SECS=1200
 SAVE_SUMMARIES_SECS=600
+# ========================== SETTINGS (MODEL) ==========================
 
 OUTPUT_STRIDE=16
 ATROUS_RATE_1=6
@@ -156,10 +172,6 @@ ATROUS_RATE_3=18
 EVAL_OUTPUT_STRIDE=8
 MODEL_VARIANT="xception_65"
 DECODER_OUTPUT_STRIDE=4
-
-BASE_LEARNING_RATE=0.007
-# BASE_LEARNING_RATE=0.001
-# BASE_LEARNING_RATE=0.0001
 
 # ========================== SETTINGS (PATHS) ==========================
 
@@ -212,7 +224,11 @@ python3 ./train.py \
   --num_clones=${NUM_CLONES} \
   --train_batch_size=${TRAIN_BATCH_SIZE} \
   --training_number_of_steps="${NUM_ITERATIONS}" \
+  --learning_policy="${LEARNING_POLICY}" \
   --base_learning_rate=${BASE_LEARNING_RATE} \
+  --learning_rate_decay_factor=${LEARNING_RATE_DECAY_FACTOR} \
+  --learning_rate_decay_step=${LEARNING_RATE_DECAY_STEP} \
+  --learning_power=${LEARNING_POWER} \
   --fine_tune_batch_norm=${FINE_TUNE_BATCH_NORM} \
   --tf_initial_checkpoint="${TF_INITIAL_CHECKPOINT}" \
   --initialize_last_layer=${INITIALIZE_LAST_LAYERS} \
