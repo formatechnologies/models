@@ -9,7 +9,13 @@ from utility.paths import STORAGE_DIR
 
 
 EXPERIMENT_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/experiments')
-experiments = os.listdir(EXPERIMENT_DIR)
+# experiments = os.listdir(EXPERIMENT_DIR)
+experiments = [
+    'dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented',
+    'abq-gpu-1_dennis_imaterialist37k_augmented_learn_rate_001_output_stride_8_batch_size_4',
+    # 'abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16',
+    # 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.007_output_stride_16_batch_size_16_init_model_pascal',
+]
 
 fig, axs = plt.subplots(1, len(experiments) + 1, figsize=(48, 48))
 fig.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
@@ -22,6 +28,7 @@ for i in range(len(axs)):
     axs[i].axis('off')
 
 for i in range(500):
+    print(i)
     fig.suptitle(f'image {i:06d}')
     image_path = os.path.join(EXPERIMENT_DIR, f'{experiments[0]}/vis/segmentation_results/{i:06d}_image.png')
     image = cv2.imread(image_path)
