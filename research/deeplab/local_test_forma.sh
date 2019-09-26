@@ -109,7 +109,7 @@ python3 ./datasets/build_forma_data.py
 
 NUM_CLONES=4  # Don't use 8, draws too much power
 TRAIN_BATCH_SIZE=16
-FINE_TUNE_BATCH_NORM=true
+FINE_TUNE_BATCH_NORM=false
 
 # ========================== SETTINGS (DATASET) ==========================
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
