@@ -108,8 +108,8 @@ python3 ./datasets/build_forma_data.py
 # FINE_TUNE_BATCH_NORM=false
 
 NUM_CLONES=4  # Don't use 8, draws too much power
-TRAIN_BATCH_SIZE=16
-FINE_TUNE_BATCH_NORM=true
+TRAIN_BATCH_SIZE=4
+FINE_TUNE_BATCH_NORM=false
 
 # ========================== SETTINGS (DATASET) ==========================
 # http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
@@ -201,7 +201,7 @@ DECODER_OUTPUT_STRIDE=4
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="augmented_learn_policy_${LEARNING_POLICY}_learn_rate_${BASE_LEARNING_RATE}_output_stride_${TRAIN_OUTPUT_STRIDE}_batch_size_${TRAIN_BATCH_SIZE}"
+EXPERIMENT_DESCRIPTION="augmented_learn_policy_${LEARNING_POLICY}_learn_rate_${BASE_LEARNING_RATE}_output_stride_${TRAIN_OUTPUT_STRIDE}_batch_size_${TRAIN_BATCH_SIZE}_crop_size_1024"
 
 EXPERIMENT_NAME="${HOSTNAME}_${USER}_${DATASET_NAME}_${EXPERIMENT_DESCRIPTION}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
@@ -231,7 +231,7 @@ python3 ./train.py \
   --atrous_rates=${TRAIN_ATROUS_RATE_3} \
   --output_stride=${TRAIN_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
-  --train_crop_size="513,513" \
+  --train_crop_size="1025,1025" \
   --num_clones=${NUM_CLONES} \
   --train_batch_size=${TRAIN_BATCH_SIZE} \
   --training_number_of_steps="${NUM_ITERATIONS}" \
