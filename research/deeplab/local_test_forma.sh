@@ -171,17 +171,26 @@ SAVE_INTERVAL_SECS=1200
 SAVE_SUMMARIES_SECS=600
 
 # ========================== SETTINGS (MODEL) ==========================
-OUTPUT_STRIDE=16
-ATROUS_RATE_1=6
-ATROUS_RATE_2=12
-ATROUS_RATE_3=18
+TRAIN_OUTPUT_STRIDE=16
+TRAIN_ATROUS_RATE_1=6
+TRAIN_ATROUS_RATE_2=12
+TRAIN_ATROUS_RATE_3=18
 
-# OUTPUT_STRIDE=8
-# ATROUS_RATE_1=12
-# ATROUS_RATE_2=24
-# ATROUS_RATE_3=36
+# TRAIN_OUTPUT_STRIDE=8
+# TRAIN_ATROUS_RATE_1=12
+# TRAIN_ATROUS_RATE_2=24
+# TRAIN_ATROUS_RATE_3=36
 
-EVAL_OUTPUT_STRIDE=8
+EVAL_OUTPUT_STRIDE=16
+EVAL_ATROUS_RATE_1=6
+EVAL_ATROUS_RATE_2=12
+EVAL_ATROUS_RATE_3=18
+
+# EVAL_OUTPUT_STRIDE=8
+# EVAL_ATROUS_RATE_1=12
+# EVAL_ATROUS_RATE_2=24
+# EVAL_ATROUS_RATE_3=36
+
 MODEL_VARIANT="xception_65"
 DECODER_OUTPUT_STRIDE=4
 
@@ -190,7 +199,7 @@ DECODER_OUTPUT_STRIDE=4
 DATE=`date +"%Y-%m-%d_%H-%M-%S"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="augmented_learn_policy_${LEARNING_POLICY}_learn_rate_${BASE_LEARNING_RATE}_output_stride_${OUTPUT_STRIDE}_batch_size_${TRAIN_BATCH_SIZE}"
+EXPERIMENT_DESCRIPTION="augmented_learn_policy_${LEARNING_POLICY}_learn_rate_${BASE_LEARNING_RATE}_output_stride_${TRAIN_OUTPUT_STRIDE}_batch_size_${TRAIN_BATCH_SIZE}"
 
 EXPERIMENT_NAME="${HOSTNAME}_${USER}_${DATASET_NAME}_${EXPERIMENT_DESCRIPTION}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
@@ -215,10 +224,10 @@ python3 ./train.py \
   --logtostderr \
   --train_split="train" \
   --model_variant=${MODEL_VARIANT} \
-  --atrous_rates=${ATROUS_RATE_1} \
-  --atrous_rates=${ATROUS_RATE_2} \
-  --atrous_rates=${ATROUS_RATE_3} \
-  --output_stride=${OUTPUT_STRIDE} \
+  --atrous_rates=${TRAIN_ATROUS_RATE_1} \
+  --atrous_rates=${TRAIN_ATROUS_RATE_2} \
+  --atrous_rates=${TRAIN_ATROUS_RATE_3} \
+  --output_stride=${TRAIN_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --train_crop_size="513,513" \
   --num_clones=${NUM_CLONES} \
@@ -247,9 +256,9 @@ python3 ./eval.py \
   --logtostderr \
   --eval_split="trainval" \
   --model_variant=${MODEL_VARIANT} \
-  --atrous_rates=${ATROUS_RATE_1} \
-  --atrous_rates=${ATROUS_RATE_2} \
-  --atrous_rates=${ATROUS_RATE_3} \
+  --atrous_rates=${EVAL_ATROUS_RATE_1} \
+  --atrous_rates=${EVAL_ATROUS_RATE_2} \
+  --atrous_rates=${EVAL_ATROUS_RATE_3} \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --eval_crop_size="${DATASET_EVAL_CROP_SIZE}" \
@@ -264,9 +273,9 @@ python3 ./vis.py \
   --logtostderr \
   --vis_split="trainval" \
   --model_variant=${MODEL_VARIANT} \
-  --atrous_rates=${ATROUS_RATE_1} \
-  --atrous_rates=${ATROUS_RATE_2} \
-  --atrous_rates=${ATROUS_RATE_3} \
+  --atrous_rates=${EVAL_ATROUS_RATE_1} \
+  --atrous_rates=${EVAL_ATROUS_RATE_2} \
+  --atrous_rates=${EVAL_ATROUS_RATE_3} \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --vis_crop_size="${DATASET_EVAL_CROP_SIZE}" \
@@ -283,9 +292,9 @@ python3 ./export_model.py \
   --checkpoint_path="${CKPT_PATH}" \
   --export_path="${EXPORT_PATH}" \
   --model_variant=${MODEL_VARIANT} \
-  --atrous_rates=${ATROUS_RATE_1} \
-  --atrous_rates=${ATROUS_RATE_2} \
-  --atrous_rates=${ATROUS_RATE_3} \
+  --atrous_rates=${EVAL_ATROUS_RATE_1} \
+  --atrous_rates=${EVAL_ATROUS_RATE_2} \
+  --atrous_rates=${EVAL_ATROUS_RATE_3} \
   --output_stride=${EVAL_OUTPUT_STRIDE} \
   --decoder_output_stride=${DECODER_OUTPUT_STRIDE} \
   --num_classes="9" \
