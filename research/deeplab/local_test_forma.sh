@@ -144,7 +144,9 @@ DATASET_SPLIT=$FORMA_DATASET_SPLIT
 
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_740000/model.ckpt-740000"
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-366824"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-693543"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-693543"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16/model.ckpt-27356"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_4/model.ckpt-109425"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
