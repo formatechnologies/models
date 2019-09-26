@@ -152,9 +152,9 @@ def preprocess_image_and_label(image,
 
 def color(x: tf.Tensor,
           hue_max_delta=0.08,
-          saturation_facter_lb=0.6,
-          saturation_facter_ub=1.6,
-          brightness_max_delta=0.05,
+          saturation_facter_lb=0.5,
+          saturation_facter_ub=1.5,
+          brightness_max_delta=0.2,
           contract_factor_lb=0.7,
           contrast_factor_ub=1.3) -> tf.Tensor:
   # https://www.wouterbulten.nl/blog/tech/data-augmentation-using-tensorflow-data-dataset/
