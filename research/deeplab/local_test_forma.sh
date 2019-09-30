@@ -138,6 +138,7 @@ DATASET_SPLIT=$FORMA_DATASET_SPLIT
 
 # ========================== SETTINGS (INITIALIZATION) ==========================
 # Init Models Paths
+# TF_INITIAL_CHECKPOINT_NAME="pascal"
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/deeplabv3_pascal_train_aug/model.ckpt"
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
@@ -146,12 +147,14 @@ DATASET_SPLIT=$FORMA_DATASET_SPLIT
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-366824"
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-693543"
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16/model.ckpt-27356"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_4/model.ckpt-109425"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_4/model.ckpt-109425"
+TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8383"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis/model.ckpt-109425"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
 # ========================== SETTINGS (LEARNING POLICY) ==========================
-NUM_EPOCHS=20
+NUM_EPOCHS=100
 NUM_EXAMPLES=`expr $DATASET_TRAIN_SIZE \* $NUM_EPOCHS`
 NUM_ITERATIONS=`expr $NUM_EXAMPLES / $TRAIN_BATCH_SIZE`
 
@@ -210,9 +213,9 @@ DECODER_OUTPUT_STRIDE=4
 DATE=`date +"%Y-%m-%d"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="num_epochs_${NUM_EPOCHS}_base_learning_rate_${BASE_LEARNING_RATE}_learning_rate_decay_${LEARNING_RATE_DECAY_FACTOR}^${LEARNING_RATE_DECAY_FACTOR_POWER}"
+EXPERIMENT_DESCRIPTION="num_epochs_${NUM_EPOCHS}_train_crop_size_${TRAIN_CROP_SIZE}_tf_initial_checkpoint_${TF_INITIAL_CHECKPOINT_NAME}_base_learning_rate_${BASE_LEARNING_RATE}_learning_rate_decay_${LEARNING_RATE_DECAY_FACTOR}^${LEARNING_RATE_DECAY_FACTOR_POWER}"
 
-EXPERIMENT_NAME="${DATASET_NAME}_${DATE}_${EXPERIMENT_DESCRIPTION}_${HOSTNAME}_${USER}"
+EXPERIMENT_NAME="${DATE}_${EXPERIMENT_DESCRIPTION}_${HOSTNAME}_${USER}_${DATASET_NAME}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
 TRAIN_LOGDIR="${EXPERIMENT_FOLDER}/train"
 EVAL_LOGDIR="${EXPERIMENT_FOLDER}/eval"
