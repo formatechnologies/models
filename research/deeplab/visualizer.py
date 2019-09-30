@@ -11,10 +11,15 @@ from utility.paths import STORAGE_DIR
 EXPERIMENT_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/experiments')
 # experiments = os.listdir(EXPERIMENT_DIR)
 experiments = [
-    'dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented',
-    'abq-gpu-1_dennis_imaterialist37k_augmented_learn_rate_001_output_stride_8_batch_size_4',
+    # 'dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented',
+    # 'abq-gpu-1_dennis_imaterialist37k_augmented_learn_rate_001_output_stride_8_batch_size_4',
     # 'abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16',
     # 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.007_output_stride_16_batch_size_16_init_model_pascal',
+    # 'abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_4',
+    # 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16',
+    'forma54k_2019-09-26_base_learn_rate_0.01_train_batch_size_16_train_crop_size_513,513_abq-gpu-2_dennis',
+    'forma54k_2019-09-26_base_learn_rate_0.001_train_batch_size_4_train_crop_size_1025,1025_abq-gpu-1_dennis',
+    'forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis'
 ]
 
 fig, axs = plt.subplots(1, len(experiments) + 1, figsize=(48, 48))

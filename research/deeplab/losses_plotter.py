@@ -26,20 +26,32 @@ if __name__ == '__main__':
     EXPERIMENTS_DIR = os.path.join(HOME_DIR, 'storage/shared/deeplab/experiments')
 
     experiments = [
+        # {
+        #     'name': 'abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16',
+        #     'batch_size': 16,
+        #     'steps_per_log': 10,
+        #     'color': 'red',
+        # },
+        # {
+        #     'name': 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.007_output_stride_16_batch_size_16_init_model_pascal',
+        #     'batch_size': 16,
+        #     'steps_per_log': 10,
+        #     'color': 'green',
+        # },
         {
-            'name': 'abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16',
+            'name': 'forma54k_2019-09-26_base_learn_rate_0.01_train_batch_size_16_train_crop_size_513,513_abq-gpu-2_dennis',
             'batch_size': 16,
             'steps_per_log': 10,
             'color': 'red',
         },
         {
-            'name': 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.007_output_stride_16_batch_size_16_init_model_pascal',
-            'batch_size': 16,
+            'name': 'forma54k_2019-09-26_base_learn_rate_0.001_train_batch_size_4_train_crop_size_1025,1025_abq-gpu-1_dennis',
+            'batch_size': 4,
             'steps_per_log': 10,
             'color': 'green',
         },
         {
-            'name': 'forma54k_2019-09-26_base_learn_rate_0.01_train_batch_size_16_train_crop_size_513,513_abq-gpu-2_dennis',
+            'name': 'forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis',
             'batch_size': 16,
             'steps_per_log': 10,
             'color': 'blue',
