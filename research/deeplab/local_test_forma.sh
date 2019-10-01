@@ -107,9 +107,9 @@ python3 ./datasets/build_forma_data.py
 # TRAIN_BATCH_SIZE=8
 # FINE_TUNE_BATCH_NORM=false
 
-NUM_CLONES=4  # Don't use 8, draws too much power
-TRAIN_BATCH_SIZE=16
-# TRAIN_BATCH_SIZE=4
+NUM_CLONES=8
+TRAIN_BATCH_SIZE=32
+# TRAIN_BATCH_SIZE=8
 FINE_TUNE_BATCH_NORM=false
 
 # ========================== SETTINGS (DATASET) ==========================
@@ -213,7 +213,7 @@ DECODER_OUTPUT_STRIDE=4
 DATE=`date +"%Y-%m-%d"`
 HOSTNAME=`hostname`
 USER=`whoami`
-EXPERIMENT_DESCRIPTION="num_epochs_${NUM_EPOCHS}_train_crop_size_${TRAIN_CROP_SIZE}_tf_initial_checkpoint_${TF_INITIAL_CHECKPOINT_NAME}_base_learning_rate_${BASE_LEARNING_RATE}_learning_rate_decay_${LEARNING_RATE_DECAY_FACTOR}^${LEARNING_RATE_DECAY_FACTOR_POWER}"
+EXPERIMENT_DESCRIPTION="num_epochs_${NUM_EPOCHS}_train_batch_size_${TRAIN_BATCH_SIZE}_train_crop_size_${TRAIN_CROP_SIZE}_tf_initial_checkpoint_${TF_INITIAL_CHECKPOINT_NAME}"
 
 EXPERIMENT_NAME="${DATE}_${EXPERIMENT_DESCRIPTION}_${HOSTNAME}_${USER}_${DATASET_NAME}"
 EXPERIMENT_FOLDER="${EXPERIMENTS_DIR}/${EXPERIMENT_NAME}"
