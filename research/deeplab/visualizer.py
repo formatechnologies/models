@@ -17,9 +17,12 @@ experiments = [
     # 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.007_output_stride_16_batch_size_16_init_model_pascal',
     # 'abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_4',
     # 'abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16',
-    'forma54k_2019-09-26_base_learn_rate_0.01_train_batch_size_16_train_crop_size_513,513_abq-gpu-2_dennis',
-    'forma54k_2019-09-26_base_learn_rate_0.001_train_batch_size_4_train_crop_size_1025,1025_abq-gpu-1_dennis',
-    'forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis'
+    # 'forma54k_2019-09-26_base_learn_rate_0.01_train_batch_size_16_train_crop_size_513,513_abq-gpu-2_dennis',
+    # 'forma54k_2019-09-26_base_learn_rate_0.001_train_batch_size_4_train_crop_size_1025,1025_abq-gpu-1_dennis',
+    'forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis',
+    '2019-10-01_num_epochs_100_train_batch_size_32_train_crop_size_513,513_tf_initial_checkpoint_forma54k_0.8383_abq-gpu-2_dennis_forma54k',
+    '2019-10-01_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_0.8383_abq-gpu-1_dennis_forma54k',
+
 ]
 
 fig, axs = plt.subplots(1, len(experiments) + 1, figsize=(48, 48))
