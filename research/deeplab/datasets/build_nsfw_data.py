@@ -236,11 +236,12 @@ def _convert_dataset(dataset_split):
 
                 # Read the semantic segmentation annotation.
                 image_ds = reduce_image_size(image, max_height=1000, max_width=1000)
-                example = deeplab_model.run(image_ds)
+                seg_dict = deeplab_model.run(image_ds)
+                seg_dict['seg_background'] = get_seg_background(seg_dict)
                 if image_ds.shape != image.shape:
-                    example = {
+                    seg_dict = {
                         k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST)
-                        for k, v in example.items()
+                        for k, v in seg_dict.items()
                     }
 
                 seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
