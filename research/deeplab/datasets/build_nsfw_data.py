@@ -227,7 +227,7 @@ def _convert_dataset(dataset_split):
         output_filename = os.path.join(
             DATASET_TFRECORD_DIR, f'{dataset}-{shard_id:05d}-of-{num_shards:05d}.tfrecord'
         )
-        with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
+        with tf.io.TFRecordWriter(output_filename) as tfrecord_writer:
             start_idx = shard_id * _NUM_PER_SHARD
             end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
             for i in tqdm(range(start_idx, end_idx)):
@@ -336,7 +336,7 @@ def main(unused_argv):
     pre_label_data()
     find_max_dimensions()
     _create_dataset_splits(DATASET_INPUT_DATA, DATASET_SPLIT_DIR)
-    dataset_splits = sorted(tf.gfile.Glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
+    dataset_splits = sorted(tf.io.gfile.glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
     for dataset_split in dataset_splits:
         _convert_dataset(dataset_split)
 
