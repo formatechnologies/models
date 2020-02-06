@@ -33,12 +33,12 @@ import collections
 import six
 import tensorflow as tf
 
-FLAGS = tf.app.flags.FLAGS
+FLAGS = tf.compat.v1.app.flags.FLAGS
 
-tf.app.flags.DEFINE_enum('image_format', 'png', ['jpg', 'jpeg', 'png'],
+tf.compat.v1.app.flags.DEFINE_enum('image_format', 'png', ['jpg', 'jpeg', 'png'],
                          'Image format.')
 
-tf.app.flags.DEFINE_enum('label_format', 'png', ['png'],
+tf.compat.v1.app.flags.DEFINE_enum('label_format', 'png', ['png'],
                          'Segmentation label format.')
 
 # A map from image format to expected data format.
