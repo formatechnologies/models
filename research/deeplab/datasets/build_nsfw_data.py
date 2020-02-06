@@ -75,8 +75,7 @@ DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
 DATASET_INPUT_DATA = os.path.join(DATASET_INPUT_DIR, 'data')
 DATASET_INPUT_IMAGE = os.path.join(DATASET_INPUT_DIR, 'image')
 DATASET_INPUT_LABEL = os.path.join(DATASET_INPUT_DIR, 'label')
-DATASET_INPUT_LABEL_IMAGE = os.path.join(DATASET_INPUT_DIR, 'label_image')
-for dir_ in [DATASET_INPUT_IMAGE, DATASET_INPUT_LABEL, DATASET_INPUT_LABEL_IMAGE]:
+for dir_ in [DATASET_INPUT_IMAGE, DATASET_INPUT_LABEL]:
     if not os.path.exists(dir_):
         os.mkdir(dir_)
 
@@ -118,15 +117,12 @@ def pre_label_data():
 
         seg_dict = deeplab_model.run(image)
 
-        seg_dict['seg_background'] = get_seg_background(seg_dict)
-        label = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
-
         seg_dict['image'] = image
-        label_image = to_np_uint8(deeplab_segmentation1_openpose_joints(seg_dict))
+        label = to_np_uint8(deeplab_segmentation1_openpose_joints(seg_dict))
+        label = np.hstack((image, label))
 
         cv2.imwrite(image_filename, image)
-        cv2.imwrite(os.path.join(DATASET_INPUT_LABEL, f'{uuid}.png'), label)
-        cv2.imwrite(os.path.join(DATASET_INPUT_LABEL_IMAGE, f'{uuid}.jpg'), label_image)
+        cv2.imwrite(os.path.join(DATASET_INPUT_LABEL, f'{uuid}.jpg'), label)
 
 
 def convert_seg(seg, color):
@@ -231,6 +227,8 @@ def _convert_dataset(dataset_split):
                 # Read the image.
                 image_filename = filenames[i]
                 image = cv2.imread(image_filename)
+                if image is None:
+                    continue
                 image_data = to_image_bytestring(image, '.jpg')
                 height, width = image.shape[:2]
 
