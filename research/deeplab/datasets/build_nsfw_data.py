@@ -51,9 +51,8 @@ The Example proto contains the following fields:
   image/segmentation/class/format: semantic segmentation file format.
 """
 import math
-import os.path
+import os
 import sys
-import build_data
 import tensorflow as tf
 
 import glob
@@ -63,37 +62,33 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 
-from utility.paths import STORAGE_DIR
-from utility.json_tools import load_dict_from_json
+from iris.utility.paths import STORAGE_DIR
+from iris.utility.json_tools import load_dict_from_json
+from iris.utility.misc import to_np_uint8
 
-FLAGS = tf.app.flags.FLAGS
+from iris.image_analysis.deeplab import DeepLabModel
 
-tf.app.flags.DEFINE_string(
-    'image_folder', './VOCdevkit/VOC2012/JPEGImages', 'Folder containing images.'
-)
+DATASET_NAME = 'nsfw'
 
-tf.app.flags.DEFINE_string(
-    'semantic_segmentation_folder',
-    './VOCdevkit/VOC2012/SegmentationClassRaw',
-    'Folder containing semantic segmentation annotations.',
-)
+DATASETS_INPUT_DIR = os.path.join(STORAGE_DIR, 'dennis/datasets')
+DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
+DATASET_INPUT_DATA = os.path.join(DATASET_INPUT_DIR, 'data')
+DATASET_INPUT_IMAGE = os.path.join(DATASET_INPUT_DIR, 'image')
+DATASET_INPUT_LABEL = os.path.join(DATASET_INPUT_DIR, 'label')
+DATASET_INPUT_LABEL_IMAGE = os.path.join(DATASET_INPUT_DIR, 'label_image')
+for dir_ in [DATASET_INPUT_IMAGE, DATASET_INPUT_LABEL, DATASET_INPUT_LABEL_IMAGE]:
+    if not os.path.exists(dir_):
+        os.mkdir(dir_)
 
-tf.app.flags.DEFINE_string(
-    'list_folder',
-    './VOCdevkit/VOC2012/ImageSets/Segmentation',
-    'Folder containing lists for training and validation',
-)
+DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
+DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
+DATASET_TFRECORD_DIR = os.path.join(DATASET_DIR, 'tfrecord')
+DATASET_SPLIT_DIR = os.path.join(DATASET_DIR, 'dataset_split')
+for dir_ in [DATASET_DIR, DATASET_TFRECORD_DIR, DATASET_SPLIT_DIR]:
+    if not os.path.exists(dir_):
+        os.mkdir(dir_)
 
-tf.app.flags.DEFINE_string(
-    'output_dir', './tfrecord', 'Path to save converted SSTable of TensorFlow examples.'
-)
-
-
-_NUM_PER_SHARD = 500
-
-DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
-DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
-LABELS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
+deeplab_model = DeepLabModel()
 
 seg_name_to_label = {
     'seg_background': 0,
@@ -107,23 +102,79 @@ seg_name_to_label = {
     'seg_pants': 8,
 }
 
-with open(LABELS_FILE, 'r') as f:
-    label_descriptions = json.load(f)
-fashion_names_to_bits = {item['name']: item['id'] for item in label_descriptions['categories']}
 
-# max_h, max_w = 0, 0
-# filenames = sorted(os.listdir(DATA_DIR))
-# for filename in tqdm(filenames):
-#   json_filename = os.path.join(DATA_DIR, filename)
-#   example = load_dict_from_json(json_filename)
-#   h, w, _ = example['image'].shape
-#   max_h = max(max_h, h)
-#   max_w = max(max_w, w)
-# print(max_h, max_w)
+def pre_label_data():
+    filenames = sorted(glob.glob(DATASET_INPUT_DATA + '/**/*'))
+    for filename in tqdm(filenames):
+        uuid = os.path.basename(filename)
+        image_filename = os.path.join(DATASET_INPUT_IMAGE, f'{uuid}.jpg')
+        if os.path.exists(image_filename):
+            continue
+
+        image = cv2.imread(filename)
+        if image is None:
+            continue
+        image = reduce_image_size(image, max_height=1000, max_width=1000)
+
+        seg_dict = deeplab_model.run(image)
+
+        seg_dict['seg_background'] = get_seg_background(seg_dict)
+        label = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
+
+        seg_dict['image'] = image
+        label_image = to_np_uint8(deeplab_segmentation1_openpose_joints(seg_dict))
+
+        cv2.imwrite(image_filename, image)
+        cv2.imwrite(os.path.join(DATASET_INPUT_LABEL, f'{uuid}.png'), label)
+        cv2.imwrite(os.path.join(DATASET_INPUT_LABEL_IMAGE, f'{uuid}.jpg'), label_image)
+
+        # from experiment.pipeline.debug import dump_dict, plot, plot_mesh, plot_landmarks, overlay_masks, plot_pts
+        # import matplotlib.pyplot as plt; plt.ion()
+        # import pdb; pdb.set_trace()
+
+
+def convert_seg(seg, color):
+    return (seg / np.float32(255))[:, :, np.newaxis].repeat(3, axis=2) * np.array(
+        color, np.float32
+    ).reshape((1, 1, 3))
+
+
+def deeplab_segmentation1_openpose_joints(info):
+    image = info['image'] / np.float32(255)
+    seg_body = convert_seg(
+        info['seg_body'] - info['seg_skin'] - info['seg_garment'] - info['seg_hair'], (1, 0, 0)
+    )
+    seg_skin = convert_seg(info['seg_skin'] - info['seg_arms'], (0, 0, 1))
+    seg_garment = convert_seg(
+        info['seg_garment'] - info['seg_sleeves'] - info['seg_pants'] - info['seg_shoe'], (0, 1, 0)
+    )
+    seg_hair = convert_seg(info['seg_hair'], (0, 1, 1))
+    seg_arms = convert_seg(info['seg_arms'], (1, 0, 1))
+    seg_shoe = convert_seg(info['seg_shoe'], (1, 1, 0))
+    seg_sleeves = convert_seg(info['seg_sleeves'], (1, 1, 1))
+    seg_pants = convert_seg(info['seg_pants'], (0.5, 0.5, 0.5))
+
+    output_image = 0.5 * image + 0.5 * (
+        seg_body + seg_skin + seg_garment + seg_hair + seg_shoe + seg_arms + seg_sleeves + seg_pants
+    )
+    return output_image.clip(0, 1)
+
+
+def find_max_dimensions():
+    max_h, max_w = 0, 0
+    filenames = sorted(glob.glob(DATASET_INPUT_DATA + '/**/*'))
+    for filename in tqdm(filenames):
+        image = cv2.imread(filename)
+        if image is None:
+            continue
+        h, w, _ = image.shape
+        max_h = max(max_h, h)
+        max_w = max(max_w, w)
+    print(max_h, max_w)
 
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
-    filenames = sorted(os.listdir(data_dir))
+    filenames = sorted(glob.glob(data_dir + '/**/*'))
 
     train_split = int(0.8 * len(filenames))
     valid_split = int(0.9 * len(filenames))
@@ -147,6 +198,10 @@ def _convert_dataset(dataset_split):
   Raises:
     RuntimeError: If loaded image and label have different shape.
   """
+    import build_data
+
+    _NUM_PER_SHARD = 500
+
     dataset = os.path.basename(dataset_split)[:-4]
     sys.stdout.write('\nProcessing ' + dataset + '\n')
     filenames = [x.strip('\n') for x in open(dataset_split, 'r')]
@@ -157,7 +212,7 @@ def _convert_dataset(dataset_split):
     while True:
         shard_id_start += 1
         output_filename = os.path.join(
-            FLAGS.output_dir, f'{dataset}-{shard_id_start:05d}-of-{num_shards:05d}.tfrecord'
+            DATASET_TFRECORD_DIR, f'{dataset}-{shard_id_start:05d}-of-{num_shards:05d}.tfrecord'
         )
         if not os.path.exists(output_filename):
             break
@@ -170,27 +225,27 @@ def _convert_dataset(dataset_split):
         if shard_id < shard_id_start:
             continue
         output_filename = os.path.join(
-            FLAGS.output_dir, f'{dataset}-{shard_id:05d}-of-{num_shards:05d}.tfrecord'
+            DATASET_TFRECORD_DIR, f'{dataset}-{shard_id:05d}-of-{num_shards:05d}.tfrecord'
         )
         with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
             start_idx = shard_id * _NUM_PER_SHARD
             end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
             for i in tqdm(range(start_idx, end_idx)):
                 # Read the image.
-                json_filename = os.path.join(DATA_DIR, filenames[i])
-                example = load_dict_from_json(json_filename)
-                image = example['image']
+                image_filename = filenames[i]
+                image = cv2.imread(image_filename)
                 image_data = to_image_bytestring(image, '.jpg')
                 height, width = image.shape[:2]
 
                 # Read the semantic segmentation annotation.
-                fashion_dict = decode_segmentation(
-                    example['seg_fashion_parsing'], fashion_names_to_bits
-                )
-                seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
-                seg_dict['seg_sleeves'] = fashion_dict['sleeve']
-                seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
-                seg_dict['seg_background'] = get_seg_background(seg_dict)
+                image_ds = reduce_image_size(image, max_height=1000, max_width=1000)
+                example = deeplab_model.run(image_ds)
+                if image_ds.shape != image.shape:
+                    example = {
+                        k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST)
+                        for k, v in example.items()
+                    }
+
                 seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
                 seg = seg[:, :, np.newaxis].repeat(3, axis=2)
                 seg_data = to_image_bytestring(seg, '.png')
@@ -244,6 +299,20 @@ def decode_segmentation_exclusive(image, decode_dict):
     return seg_dict
 
 
+def reduce_image_size(image, max_height=1000, max_width=1000):
+    """
+    Reduce an numpy array image to a certain max size
+    """
+    h, w, _ = image.shape
+
+    ratio_h = h / max_height
+    ratio_w = w / max_width
+    ratio = max(ratio_h, ratio_w)
+    if ratio < 1:
+        return image
+    return cv2.resize(image, (int(w / ratio), int(h / ratio)), interpolation=cv2.INTER_AREA)
+
+
 def to_image_bytestring(arr, ext='.png'):
     """
   Args:
@@ -264,11 +333,13 @@ def get_seg_background(seg_dict):
 
 
 def main(unused_argv):
-    _create_dataset_splits(DATA_DIR, FLAGS.list_folder)
-    dataset_splits = sorted(tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt')))
+    pre_label_data()
+    find_max_dimensions()
+    _create_dataset_splits(DATASET_INPUT_DATA, DATASET_SPLIT_DIR)
+    dataset_splits = sorted(tf.gfile.Glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
     for dataset_split in dataset_splits:
         _convert_dataset(dataset_split)
 
 
 if __name__ == '__main__':
-    tf.app.run()
+    main(None)
