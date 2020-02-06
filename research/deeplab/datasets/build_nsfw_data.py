@@ -128,10 +128,6 @@ def pre_label_data():
         cv2.imwrite(os.path.join(DATASET_INPUT_LABEL, f'{uuid}.png'), label)
         cv2.imwrite(os.path.join(DATASET_INPUT_LABEL_IMAGE, f'{uuid}.jpg'), label_image)
 
-        # from experiment.pipeline.debug import dump_dict, plot, plot_mesh, plot_landmarks, overlay_masks, plot_pts
-        # import matplotlib.pyplot as plt; plt.ion()
-        # import pdb; pdb.set_trace()
-
 
 def convert_seg(seg, color):
     return (seg / np.float32(255))[:, :, np.newaxis].repeat(3, axis=2) * np.array(
@@ -171,6 +167,7 @@ def find_max_dimensions():
         max_h = max(max_h, h)
         max_w = max(max_w, w)
     print(max_h, max_w)
+    # nsfw: (5760, 6000)
 
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
@@ -192,12 +189,12 @@ def _create_dataset_splits(data_dir, dataset_split_dir):
 def _convert_dataset(dataset_split):
     """Converts the specified dataset split to TFRecord format.
 
-  Args:
-    dataset_split: The dataset split (e.g., train, test).
+    Args:
+        dataset_split: The dataset split (e.g., train, test).
 
-  Raises:
-    RuntimeError: If loaded image and label have different shape.
-  """
+    Raises:
+        RuntimeError: If loaded image and label have different shape.
+    """
     import build_data
 
     _NUM_PER_SHARD = 500
@@ -315,12 +312,12 @@ def reduce_image_size(image, max_height=1000, max_width=1000):
 
 def to_image_bytestring(arr, ext='.png'):
     """
-  Args:
-    arr: a numpy array
+    Args:
+        arr: a numpy array
 
-  Returns:
-    a bytestring of the array encoded as a jpg
-  """
+    Returns:
+        a bytestring of the array encoded as a jpg
+    """
     success, arr_jpg = cv2.imencode(ext, arr)
     return arr_jpg.tostring()
 
