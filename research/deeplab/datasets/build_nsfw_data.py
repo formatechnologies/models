@@ -68,7 +68,7 @@ from iris.utility.misc import to_np_uint8
 
 from iris.image_analysis.deeplab import DeepLabModel
 
-DATASET_NAME = 'nsfw_clean'
+DATASET_NAME = 'nsfw1k'
 
 DATASETS_INPUT_DIR = os.path.join(STORAGE_DIR, 'dennis/datasets')
 DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
@@ -98,7 +98,7 @@ seg_name_to_label = {
 
 def find_max_dimensions():
     max_h, max_w = 0, 0
-    filenames = sorted(glob.glob(DATASET_INPUT_DATA + '/**/*'))
+    filenames = sorted(glob.glob(DATASET_INPUT_DATA + '/*'))
     for filename in tqdm(filenames):
         image = cv2.imread(filename)
         if image is None:
@@ -111,7 +111,7 @@ def find_max_dimensions():
 
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
-    filenames = sorted(glob.glob(data_dir + '/**/*'))
+    filenames = sorted(glob.glob(data_dir + '/*'))
 
     train_split = int(0.8 * len(filenames))
     valid_split = int(0.9 * len(filenames))
