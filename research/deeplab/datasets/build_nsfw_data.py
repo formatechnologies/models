@@ -68,16 +68,11 @@ from iris.utility.misc import to_np_uint8
 
 from iris.image_analysis.deeplab import DeepLabModel
 
-DATASET_NAME = 'nsfw'
+DATASET_NAME = 'nsfw_clean'
 
 DATASETS_INPUT_DIR = os.path.join(STORAGE_DIR, 'dennis/datasets')
 DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
 DATASET_INPUT_DATA = os.path.join(DATASET_INPUT_DIR, 'data')
-DATASET_INPUT_IMAGE = os.path.join(DATASET_INPUT_DIR, 'image')
-DATASET_INPUT_LABEL = os.path.join(DATASET_INPUT_DIR, 'label')
-for dir_ in [DATASET_INPUT_IMAGE, DATASET_INPUT_LABEL]:
-    if not os.path.exists(dir_):
-        os.mkdir(dir_)
 
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
@@ -100,57 +95,6 @@ seg_name_to_label = {
     'seg_sleeves': 7,
     'seg_pants': 8,
 }
-
-
-def pre_label_data():
-    filenames = sorted(glob.glob(DATASET_INPUT_DATA + '/**/*'))
-    for filename in tqdm(filenames):
-        uuid = os.path.basename(filename)
-        image_filename = os.path.join(DATASET_INPUT_IMAGE, f'{uuid}.jpg')
-        if os.path.exists(image_filename):
-            continue
-
-        image = cv2.imread(filename)
-        if image is None:
-            continue
-        image = reduce_image_size(image, max_height=1000, max_width=1000)
-
-        seg_dict = deeplab_model.run(image)
-
-        seg_dict['image'] = image
-        label = to_np_uint8(deeplab_segmentation1_openpose_joints(seg_dict))
-        label = np.hstack((image, label))
-
-        cv2.imwrite(image_filename, image)
-        cv2.imwrite(os.path.join(DATASET_INPUT_LABEL, f'{uuid}.jpg'), label)
-
-
-def convert_seg(seg, color):
-    return (seg / np.float32(255))[:, :, np.newaxis].repeat(3, axis=2) * np.array(
-        color, np.float32
-    ).reshape((1, 1, 3))
-
-
-def deeplab_segmentation1_openpose_joints(info):
-    image = info['image'] / np.float32(255)
-    seg_body = convert_seg(
-        info['seg_body'] - info['seg_skin'] - info['seg_garment'] - info['seg_hair'], (1, 0, 0)
-    )
-    seg_skin = convert_seg(info['seg_skin'] - info['seg_arms'], (0, 0, 1))
-    seg_garment = convert_seg(
-        info['seg_garment'] - info['seg_sleeves'] - info['seg_pants'] - info['seg_shoe'], (0, 1, 0)
-    )
-    seg_hair = convert_seg(info['seg_hair'], (0, 1, 1))
-    seg_arms = convert_seg(info['seg_arms'], (1, 0, 1))
-    seg_shoe = convert_seg(info['seg_shoe'], (1, 1, 0))
-    seg_sleeves = convert_seg(info['seg_sleeves'], (1, 1, 1))
-    seg_pants = convert_seg(info['seg_pants'], (0.5, 0.5, 0.5))
-
-    output_image = 0.5 * image + 0.5 * (
-        seg_body + seg_skin + seg_garment + seg_hair + seg_shoe + seg_arms + seg_sleeves + seg_pants
-    )
-    return output_image.clip(0, 1)
-
 
 def find_max_dimensions():
     max_h, max_w = 0, 0
@@ -329,7 +273,6 @@ def get_seg_background(seg_dict):
 
 
 def main(unused_argv):
-    pre_label_data()
     find_max_dimensions()
     _create_dataset_splits(DATASET_INPUT_DATA, DATASET_SPLIT_DIR)
     dataset_splits = sorted(tf.io.gfile.glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
