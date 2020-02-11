@@ -179,6 +179,8 @@ def _convert_dataset(dataset_split):
                 # Read the semantic segmentation annotation.
                 image_ds = reduce_image_size(image, max_height=1000, max_width=1000)
                 seg_dict = deeplab_model.run(image_ds)
+                seg_dict['seg_skin'] = np.maximum(seg_dict['seg_skin'], seg_dict['seg_garment'])
+                seg_dict['seg_garment'] = np.zeros_like(seg_dict['seg_garment'])
                 seg_dict['seg_background'] = get_seg_background(seg_dict)
                 if image_ds.shape != image.shape:
                     seg_dict = {
@@ -273,7 +275,7 @@ def get_seg_background(seg_dict):
 
 
 def main(unused_argv):
-    find_max_dimensions()
+    # find_max_dimensions()
     _create_dataset_splits(DATASET_INPUT_DATA, DATASET_SPLIT_DIR)
     dataset_splits = sorted(tf.io.gfile.glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
     for dataset_split in dataset_splits:
