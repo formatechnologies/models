@@ -68,7 +68,7 @@ import cv2
 from iris.utility.paths import STORAGE_DIR
 from iris.utility.json_tools import load_dict_from_json
 
-from deeplab_model.deeplab import HumanParsingMachine
+from iris.image_analysis.deeplab import DeepLabModel
 
 FLAGS = tf.compat.v1.app.flags.FLAGS
 
@@ -123,7 +123,7 @@ with open(HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE, 'r') as f:
   lines = [line.strip().split(' ') for line in f.readlines()]
 human_parsing_labels_to_numbers = {line[0]: int(line[-1]) for line in lines}
 
-human_parsing_machine = HumanParsingMachine()
+deeplab_model = DeepLabModel()
 
 # max_h, max_w = 0, 0
 # filenames = sorted(os.listdir(HUMAN_PARSING_IMAGE_DIR))
@@ -214,7 +214,7 @@ def _convert_dataset(dataset_split):
         seg_dict['seg_shoe'] = multi_max(example, ['left-shoe', 'right-shoe'])
 
         image_ds = reduce_image_size2(image, max_height=1000, max_width=1000)
-        example = human_parsing_machine.run(image_ds)
+        example = deeplab_model.run(image_ds)
         if image_ds.shape != image.shape:
           example = {k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST) for k, v in example.items()}
         seg_dict['seg_sleeves'] = example['seg_sleeves']
