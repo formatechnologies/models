@@ -113,6 +113,24 @@ mkdir -p "${FORMA_DATASET_SPLIT}"
 # Build forma data (by combining all datasets)
 python3 ./datasets/build_forma_data.py
 
+# ========================== BUILD DATASET (FORMA55K) ==========================
+echo "BUILD DATASET (FORMA55K)"
+
+FORMA55K_DATASET_NAME='forma55k'
+FORMA55K_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
+FORMA55K_DATASET_TRAIN_SIZE=44770
+
+FORMA55K_DATASET_DIR="${DATASETS_DIR}/${FORMA55K_DATASET_NAME}"
+FORMA55K_DATASET_TFRECORD="${FORMA55K_DATASET_DIR}/tfrecord"
+FORMA55K_DATASET_SPLIT="${FORMA55K_DATASET_DIR}/dataset_split"
+mkdir -p "${FORMA55K_DATASET_DIR}"
+mkdir -p "${FORMA55K_DATASET_TFRECORD}"
+mkdir -p "${FORMA55K_DATASET_SPLIT}"
+
+# TODO: make data input dir a TF flag
+# Build forma data (by combining all datasets)
+python3 ./datasets/build_forma55k_data.py
+
 # ========================== SETTINGS (WORKSTATION) ==========================
 # # Dennis Workstation Settings
 # export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
