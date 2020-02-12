@@ -66,23 +66,23 @@ import cv2
 from iris.utility.paths import STORAGE_DIR
 from iris.utility.json_tools import load_dict_from_json
 
-FLAGS = tf.app.flags.FLAGS
+FLAGS = tf.compat.v1.app.flags.FLAGS
 
-tf.app.flags.DEFINE_string('image_folder',
+tf.compat.v1.app.flags.DEFINE_string('image_folder',
                            './VOCdevkit/VOC2012/JPEGImages',
                            'Folder containing images.')
 
-tf.app.flags.DEFINE_string(
+tf.compat.v1.app.flags.DEFINE_string(
     'semantic_segmentation_folder',
     './VOCdevkit/VOC2012/SegmentationClassRaw',
     'Folder containing semantic segmentation annotations.')
 
-tf.app.flags.DEFINE_string(
+tf.compat.v1.app.flags.DEFINE_string(
     'list_folder',
     './VOCdevkit/VOC2012/ImageSets/Segmentation',
     'Folder containing lists for training and validation')
 
-tf.app.flags.DEFINE_string(
+tf.compat.v1.app.flags.DEFINE_string(
     'output_dir',
     './tfrecord',
     'Path to save converted SSTable of TensorFlow examples.')
@@ -165,7 +165,7 @@ def _convert_dataset(dataset_split):
     if shard_id < shard_id_start:
       continue
     output_filename = os.path.join(FLAGS.output_dir, f'{dataset}-{shard_id:05d}-of-{num_shards:05d}.tfrecord')
-    with tf.python_io.TFRecordWriter(output_filename) as tfrecord_writer:
+    with tf.io.TFRecordWriter(output_filename) as tfrecord_writer:
       start_idx = shard_id * _NUM_PER_SHARD
       end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
       for i in tqdm(range(start_idx, end_idx)):
@@ -248,10 +248,10 @@ def get_seg_background(seg_dict):
 
 def main(unused_argv):
   _create_dataset_splits(DATA_DIR, FLAGS.list_folder)
-  dataset_splits = sorted(tf.gfile.Glob(os.path.join(FLAGS.list_folder, '*.txt')))
+  dataset_splits = sorted(tf.io.gfile.glob(os.path.join(FLAGS.list_folder, '*.txt')))
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)
 
 
 if __name__ == '__main__':
-  tf.app.run()
+  tf.compat.v1.app.run()
