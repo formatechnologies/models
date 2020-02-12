@@ -46,21 +46,21 @@ DATASETS_DIR="${DEEPLAB_DIR}/datasets"
 EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 
 # ========================== SELECT DATASET ==========================
-DATASET_NAME="imaterialist37k"
-DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
-DATASET_TRAIN_SIZE=29606
+# DATASET_NAME="imaterialist37k"
+# DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=29606
 
-DATASET_NAME='humanparsing17k'
-DATASET_EVAL_CROP_SIZE="1601,1137" # Max image dimensions + 1
-DATASET_TRAIN_SIZE=14164
+# DATASET_NAME='humanparsing17k'
+# DATASET_EVAL_CROP_SIZE="1601,1137" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=14164
 
-DATASET_NAME='nsfw1k'
-DATASET_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
-DATASET_TRAIN_SIZE=1000
+# DATASET_NAME='nsfw1k'
+# DATASET_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=1000
 
-DATASET_NAME='forma54k'
-DATASET_EVAL_CROP_SIZE="1601,3783"   # Max image dimensions + 1
-DATASET_TRAIN_SIZE=43770
+# DATASET_NAME='forma54k'
+# DATASET_EVAL_CROP_SIZE="1601,3783"   # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=43770
 
 DATASET_NAME='forma55k'
 DATASET_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
