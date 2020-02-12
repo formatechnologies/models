@@ -47,15 +47,9 @@ IMATERIALIST_DATASET_TRAIN_SIZE=29606
 IMATERIALIST_DATASET_DIR="${DATASETS_DIR}/${IMATERIALIST_DATASET_NAME}"
 IMATERIALIST_DATASET_TFRECORD="${IMATERIALIST_DATASET_DIR}/tfrecord"
 IMATERIALIST_DATASET_SPLIT="${IMATERIALIST_DATASET_DIR}/dataset_split"
-mkdir -p "${IMATERIALIST_DATASET_DIR}"
-mkdir -p "${IMATERIALIST_DATASET_TFRECORD}"
-mkdir -p "${IMATERIALIST_DATASET_SPLIT}"
-
 # TODO: make data input dir a TF flag
 # Build imaterialist data (from ~/storage/shared/datasets/json/train_json/)
-python3 ./datasets/build_imaterialist_data.py \
-    --output_dir="${IMATERIALIST_DATASET_TFRECORD}" \
-    --list_folder="${IMATERIALIST_DATASET_SPLIT}"
+python3 ./datasets/build_imaterialist_data.py
 
 # ========================== BUILD DATASET (HUMANPARSING17K) ==========================
 echo "BUILD DATASET (HUMANPARSING17K)"
@@ -67,15 +61,10 @@ HUMANPARSING_DATASET_TRAIN_SIZE=14164
 HUMANPARSING_DATASET_DIR="${DATASETS_DIR}/${HUMANPARSING_DATASET_NAME}"
 HUMANPARSING_DATASET_TFRECORD="${HUMANPARSING_DATASET_DIR}/tfrecord"
 HUMANPARSING_DATASET_SPLIT="${HUMANPARSING_DATASET_DIR}/dataset_split"
-mkdir -p "${HUMANPARSING_DATASET_DIR}"
-mkdir -p "${HUMANPARSING_DATASET_TFRECORD}"
-mkdir -p "${HUMANPARSING_DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
 # Build human_parsing data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
-python3 ./datasets/build_human_parsing_data.py \
-    --output_dir="${HUMANPARSING_DATASET_TFRECORD}" \
-    --list_folder="${HUMANPARSING_DATASET_SPLIT}"
+python3 ./datasets/build_human_parsing_data.py
 
 # ========================== BUILD DATASET (NSFW1K) ==========================
 echo "BUILD DATASET (NSFW1K)"
@@ -87,9 +76,6 @@ NSFW_DATASET_TRAIN_SIZE=1000
 NSFW_DATASET_DIR="${DATASETS_DIR}/${NSFW_DATASET_NAME}"
 NSFW_DATASET_TFRECORD="${NSFW_DATASET_DIR}/tfrecord"
 NSFW_DATASET_SPLIT="${NSFW_DATASET_DIR}/dataset_split"
-mkdir -p "${NSFW_DATASET_DIR}"
-mkdir -p "${NSFW_DATASET_TFRECORD}"
-mkdir -p "${NSFW_DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
 # Build nsfw data (from ~/storage/shared/datasets/nsfw/)
@@ -105,9 +91,6 @@ FORMA_DATASET_TRAIN_SIZE=43770
 FORMA_DATASET_DIR="${DATASETS_DIR}/${FORMA_DATASET_NAME}"
 FORMA_DATASET_TFRECORD="${FORMA_DATASET_DIR}/tfrecord"
 FORMA_DATASET_SPLIT="${FORMA_DATASET_DIR}/dataset_split"
-mkdir -p "${FORMA_DATASET_DIR}"
-mkdir -p "${FORMA_DATASET_TFRECORD}"
-mkdir -p "${FORMA_DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
 # Build forma data (by combining all datasets)
@@ -123,9 +106,6 @@ FORMA55K_DATASET_TRAIN_SIZE=44770
 FORMA55K_DATASET_DIR="${DATASETS_DIR}/${FORMA55K_DATASET_NAME}"
 FORMA55K_DATASET_TFRECORD="${FORMA55K_DATASET_DIR}/tfrecord"
 FORMA55K_DATASET_SPLIT="${FORMA55K_DATASET_DIR}/dataset_split"
-mkdir -p "${FORMA55K_DATASET_DIR}"
-mkdir -p "${FORMA55K_DATASET_TFRECORD}"
-mkdir -p "${FORMA55K_DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
 # Build forma data (by combining all datasets)
