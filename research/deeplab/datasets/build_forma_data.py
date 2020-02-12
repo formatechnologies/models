@@ -4,7 +4,7 @@ import shutil
 
 from tqdm import tqdm
 
-from utility.paths import STORAGE_DIR
+from iris.utility.paths import STORAGE_DIR
 
 DEEPLAB_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab')
 DATASETS_DIR = os.path.join(DEEPLAB_DIR, 'datasets')

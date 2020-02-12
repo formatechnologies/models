@@ -63,8 +63,8 @@ from tqdm import tqdm
 import numpy as np
 import cv2
 
-from utility.paths import STORAGE_DIR
-from utility.json_tools import load_dict_from_json
+from iris.utility.paths import STORAGE_DIR
+from iris.utility.json_tools import load_dict_from_json
 
 FLAGS = tf.app.flags.FLAGS
 
