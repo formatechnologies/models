@@ -15,10 +15,9 @@ dataset_splits = ['train', 'trainval', 'val']
 
 DATASET_FORMA_DIR = os.path.join(DATASETS_DIR, dataset_name_forma)
 DATASET_FORMA_TFRECORD_DIR = os.path.join(DATASET_FORMA_DIR, 'tfrecord')
-if not os.path.exists(DATASET_FORMA_DIR):
-    os.mkdir(DATASET_FORMA_DIR)
-if not os.path.exists(DATASET_FORMA_TFRECORD_DIR):
-    os.mkdir(DATASET_FORMA_TFRECORD_DIR)
+for dir_ in [DATASET_FORMA_DIR, DATASET_FORMA_TFRECORD_DIR]:
+    if not os.path.exists(dir_):
+        os.mkdir(dir_)
 
 print(f'Building {dataset_name_forma}')
 for dataset_split in dataset_splits:
