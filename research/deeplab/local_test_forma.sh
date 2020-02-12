@@ -93,7 +93,7 @@ mkdir -p "${NSFW_DATASET_SPLIT}"
 
 # TODO: make data input dir a TF flag
 # Build nsfw data (from ~/storage/shared/datasets/nsfw/)
-python3 ./datasets/build_human_parsing_data.py
+python3 ./datasets/build_nsfw_data.py
 
 # ========================== BUILD DATASET (FORMA54K) ==========================
 echo "BUILD DATASET (FORMA54K)"
