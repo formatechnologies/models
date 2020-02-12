@@ -113,8 +113,8 @@ def find_max_dimensions():
 def _create_dataset_splits(data_dir, dataset_split_dir):
     filenames = sorted(glob.glob(data_dir + '/*'))
 
-    train_split = int(0.8 * len(filenames))
-    valid_split = int(0.9 * len(filenames))
+    train_split = 1000
+    valid_split = 1100
 
     if not os.path.exists(dataset_split_dir):
         os.mkdir(dataset_split_dir)
