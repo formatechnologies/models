@@ -275,6 +275,7 @@ def get_seg_background(seg_dict):
 
 
 def main(unused_argv):
+    print(f'Building {DATASET_NAME}')
     # find_max_dimensions()
     _create_dataset_splits(DATASET_INPUT_DATA, DATASET_SPLIT_DIR)
     dataset_splits = sorted(tf.io.gfile.glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))

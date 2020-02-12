@@ -235,6 +235,7 @@ def get_seg_background(seg_dict):
   return image
 
 def main(unused_argv):
+  print(f'Building {DATASET_NAME}')
   _create_dataset_splits(DATA_DIR, DATASET_SPLIT_DIR)
   dataset_splits = sorted(tf.io.gfile.glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
   for dataset_split in dataset_splits:
