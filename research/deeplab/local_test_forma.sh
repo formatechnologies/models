@@ -70,10 +70,6 @@ DATASET_SPLIT="${DATASET_DIR}/dataset_split"
 # FINE_TUNE_BATCH_NORM=false
 
 # GPU 1 + GPU 2 Workstation Settings
-# NUM_CLONES=8
-# TRAIN_BATCH_SIZE=8
-# FINE_TUNE_BATCH_NORM=false
-
 NUM_CLONES=8
 TRAIN_BATCH_SIZE=32
 # TRAIN_BATCH_SIZE=8
@@ -86,11 +82,6 @@ FINE_TUNE_BATCH_NORM=false
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_740000/model.ckpt-740000"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-366824"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/dennis-Z370-HD3-OP_dennis_imaterialist37k_augmented/model.ckpt-693543"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-2_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_16/model.ckpt-27356"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/abq-gpu-1_dennis_forma54k_augmented_learn_policy_step_learn_rate_0.001_output_stride_16_batch_size_4/model.ckpt-109425"
 # TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8383"
 # TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis/model.ckpt-109425"
 # TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8428"
