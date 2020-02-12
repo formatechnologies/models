@@ -70,27 +70,6 @@ from iris.utility.json_tools import load_dict_from_json
 
 from iris.image_analysis.deeplab import DeepLabModel
 
-FLAGS = tf.compat.v1.app.flags.FLAGS
-
-tf.compat.v1.app.flags.DEFINE_string('image_folder',
-                           './VOCdevkit/VOC2012/JPEGImages',
-                           'Folder containing images.')
-
-tf.compat.v1.app.flags.DEFINE_string(
-    'semantic_segmentation_folder',
-    './VOCdevkit/VOC2012/SegmentationClassRaw',
-    'Folder containing semantic segmentation annotations.')
-
-tf.compat.v1.app.flags.DEFINE_string(
-    'list_folder',
-    './VOCdevkit/VOC2012/ImageSets/Segmentation',
-    'Folder containing lists for training and validation')
-
-tf.compat.v1.app.flags.DEFINE_string(
-    'output_dir',
-    './tfrecord',
-    'Path to save converted SSTable of TensorFlow examples.')
-
 
 _NUM_PER_SHARD = 500
 
@@ -102,6 +81,15 @@ IMATERIALIST_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/
 HUMAN_PARSING_IMAGE_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/JPEGImages/')
 HUMAN_PARSING_LABEL_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/SegmentationClassAug/')
 HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/atr_label.txt')
+
+DATASET_NAME = 'humanparsing17k'
+DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
+DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
+DATASET_TFRECORD_DIR = os.path.join(DATASET_DIR, 'tfrecord')
+DATASET_SPLIT_DIR = os.path.join(DATASET_DIR, 'dataset_split')
+for dir_ in [DATASET_DIR, DATASET_TFRECORD_DIR, DATASET_SPLIT_DIR]:
+    if not os.path.exists(dir_):
+        os.mkdir(dir_)
 
 seg_name_to_label = {
   'seg_background': 0,
@@ -170,7 +158,7 @@ def _convert_dataset(dataset_split):
   shard_id_start = -1
   while True:
     shard_id_start += 1
-    output_filename = os.path.join(FLAGS.output_dir, f'{dataset}-{shard_id_start:05d}-of-{num_shards:05d}.tfrecord')
+    output_filename = os.path.join(DATASET_TFRECORD_DIR, f'{dataset}-{shard_id_start:05d}-of-{num_shards:05d}.tfrecord')
     if not os.path.exists(output_filename):
       break
   # shard_id_start = 0
@@ -181,7 +169,7 @@ def _convert_dataset(dataset_split):
   for shard_id in tqdm(range(num_shards)):
     if shard_id < shard_id_start:
       continue
-    output_filename = os.path.join(FLAGS.output_dir, f'{dataset}-{shard_id:05d}-of-{num_shards:05d}.tfrecord')
+    output_filename = os.path.join(DATASET_TFRECORD_DIR, f'{dataset}-{shard_id:05d}-of-{num_shards:05d}.tfrecord')
     with tf.io.TFRecordWriter(output_filename) as tfrecord_writer:
       start_idx = shard_id * _NUM_PER_SHARD
       end_idx = min((shard_id + 1) * _NUM_PER_SHARD, num_images)
@@ -304,8 +292,8 @@ def get_seg_background(seg_dict):
   return image
 
 def main(unused_argv):
-  _create_dataset_splits(HUMAN_PARSING_IMAGE_DIR, FLAGS.list_folder)
-  dataset_splits = sorted(tf.io.gfile.glob(os.path.join(FLAGS.list_folder, '*.txt')))
+  _create_dataset_splits(HUMAN_PARSING_IMAGE_DIR, DATASET_SPLIT_DIR)
+  dataset_splits = sorted(tf.io.gfile.glob(os.path.join(DATASET_SPLIT_DIR, '*.txt')))
   for dataset_split in dataset_splits:
     _convert_dataset(dataset_split)
 
