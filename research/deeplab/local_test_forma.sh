@@ -77,6 +77,24 @@ python3 ./datasets/build_human_parsing_data.py \
     --output_dir="${HUMANPARSING_DATASET_TFRECORD}" \
     --list_folder="${HUMANPARSING_DATASET_SPLIT}"
 
+# ========================== BUILD DATASET (NSFW1K) ==========================
+echo "BUILD DATASET (NSFW1K)"
+
+NSFW_DATASET_NAME='nsfw1k'
+NSFW_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
+NSFW_DATASET_TRAIN_SIZE=1000
+
+NSFW_DATASET_DIR="${DATASETS_DIR}/${NSFW_DATASET_NAME}"
+NSFW_DATASET_TFRECORD="${NSFW_DATASET_DIR}/tfrecord"
+NSFW_DATASET_SPLIT="${NSFW_DATASET_DIR}/dataset_split"
+mkdir -p "${NSFW_DATASET_DIR}"
+mkdir -p "${NSFW_DATASET_TFRECORD}"
+mkdir -p "${NSFW_DATASET_SPLIT}"
+
+# TODO: make data input dir a TF flag
+# Build nsfw data (from ~/storage/shared/datasets/nsfw/)
+python3 ./datasets/build_human_parsing_data.py
+
 # ========================== BUILD DATASET (FORMA54K) ==========================
 echo "BUILD DATASET (FORMA54K)"
 
