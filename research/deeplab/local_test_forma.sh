@@ -31,6 +31,14 @@ cd ..
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 cd deeplab
 
+# ========================== BUILD DATASETS (TF 2.0.0) ==========================
+python3 ./datasets/build_imaterialist_data.py
+python3 ./datasets/build_human_parsing_data.py
+python3 ./datasets/build_nsfw_data.py
+python3 ./datasets/build_forma_data.py
+python3 ./datasets/build_forma55k_data.py
+
+# ========================== EVERYTHING ELSE (TF 1.15) ==========================
 # Deeplab Path
 DEEPLAB_DIR="${HOME}/storage/shared/deeplab"
 INIT_MODELS_DIR="${DEEPLAB_DIR}/init_models"
@@ -38,78 +46,44 @@ DATASETS_DIR="${DEEPLAB_DIR}/datasets"
 EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 
 # ========================== BUILD DATASET (IMATERIALIST37K) ==========================
-echo "BUILD DATASET (IMATERIALIST37K)"
-
 IMATERIALIST_DATASET_NAME="imaterialist37k"
 IMATERIALIST_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
 IMATERIALIST_DATASET_TRAIN_SIZE=29606
-
 IMATERIALIST_DATASET_DIR="${DATASETS_DIR}/${IMATERIALIST_DATASET_NAME}"
 IMATERIALIST_DATASET_TFRECORD="${IMATERIALIST_DATASET_DIR}/tfrecord"
 IMATERIALIST_DATASET_SPLIT="${IMATERIALIST_DATASET_DIR}/dataset_split"
-# TODO: make data input dir a TF flag
-# Build imaterialist data (from ~/storage/shared/datasets/json/train_json/)
-python3 ./datasets/build_imaterialist_data.py
 
 # ========================== BUILD DATASET (HUMANPARSING17K) ==========================
-echo "BUILD DATASET (HUMANPARSING17K)"
-
 HUMANPARSING_DATASET_NAME='humanparsing17k'
 HUMANPARSING_EVAL_CROP_SIZE="1601,1137" # Max image dimensions + 1
 HUMANPARSING_DATASET_TRAIN_SIZE=14164
-
 HUMANPARSING_DATASET_DIR="${DATASETS_DIR}/${HUMANPARSING_DATASET_NAME}"
 HUMANPARSING_DATASET_TFRECORD="${HUMANPARSING_DATASET_DIR}/tfrecord"
 HUMANPARSING_DATASET_SPLIT="${HUMANPARSING_DATASET_DIR}/dataset_split"
 
-# TODO: make data input dir a TF flag
-# Build human_parsing data (from ~/storage/shared/datasets/HumanParsing-Dataset/humanparsing/)
-python3 ./datasets/build_human_parsing_data.py
-
 # ========================== BUILD DATASET (NSFW1K) ==========================
-echo "BUILD DATASET (NSFW1K)"
-
 NSFW_DATASET_NAME='nsfw1k'
 NSFW_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
 NSFW_DATASET_TRAIN_SIZE=1000
-
 NSFW_DATASET_DIR="${DATASETS_DIR}/${NSFW_DATASET_NAME}"
 NSFW_DATASET_TFRECORD="${NSFW_DATASET_DIR}/tfrecord"
 NSFW_DATASET_SPLIT="${NSFW_DATASET_DIR}/dataset_split"
 
-# TODO: make data input dir a TF flag
-# Build nsfw data (from ~/storage/shared/datasets/nsfw/)
-python3 ./datasets/build_nsfw_data.py
-
 # ========================== BUILD DATASET (FORMA54K) ==========================
-echo "BUILD DATASET (FORMA54K)"
-
 FORMA_DATASET_NAME='forma54k'
 FORMA_EVAL_CROP_SIZE="1601,3783"   # Max image dimensions + 1
 FORMA_DATASET_TRAIN_SIZE=43770
-
 FORMA_DATASET_DIR="${DATASETS_DIR}/${FORMA_DATASET_NAME}"
 FORMA_DATASET_TFRECORD="${FORMA_DATASET_DIR}/tfrecord"
 FORMA_DATASET_SPLIT="${FORMA_DATASET_DIR}/dataset_split"
 
-# TODO: make data input dir a TF flag
-# Build forma data (by combining all datasets)
-python3 ./datasets/build_forma_data.py
-
 # ========================== BUILD DATASET (FORMA55K) ==========================
-echo "BUILD DATASET (FORMA55K)"
-
 FORMA55K_DATASET_NAME='forma55k'
 FORMA55K_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
 FORMA55K_DATASET_TRAIN_SIZE=44770
-
 FORMA55K_DATASET_DIR="${DATASETS_DIR}/${FORMA55K_DATASET_NAME}"
 FORMA55K_DATASET_TFRECORD="${FORMA55K_DATASET_DIR}/tfrecord"
 FORMA55K_DATASET_SPLIT="${FORMA55K_DATASET_DIR}/dataset_split"
-
-# TODO: make data input dir a TF flag
-# Build forma data (by combining all datasets)
-python3 ./datasets/build_forma55k_data.py
 
 # ========================== SETTINGS (WORKSTATION) ==========================
 # # Dennis Workstation Settings
