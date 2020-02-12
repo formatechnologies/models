@@ -31,14 +31,6 @@ cd ..
 export PYTHONPATH=$PYTHONPATH:`pwd`:`pwd`/slim
 cd deeplab
 
-# ========================== BUILD DATASETS (TF 2.0.0) ==========================
-python3 ./datasets/build_imaterialist_data.py
-python3 ./datasets/build_human_parsing_data.py
-python3 ./datasets/build_nsfw_data.py
-python3 ./datasets/build_forma_data.py
-python3 ./datasets/build_forma55k_data.py
-
-# ========================== EVERYTHING ELSE (TF 1.15) ==========================
 # Deeplab Path
 DEEPLAB_DIR="${HOME}/storage/shared/deeplab"
 INIT_MODELS_DIR="${DEEPLAB_DIR}/init_models"
