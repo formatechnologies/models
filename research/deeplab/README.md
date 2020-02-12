@@ -17,6 +17,18 @@ sh local_test.sh
 ```
 
 ## Dataset Creation
+Build existing Forma datasets (requires `tensorflow-gpu==2.0.0`, like `iris`):
+```
+python3 ./datasets/build_imaterialist_data.py
+python3 ./datasets/build_human_parsing_data.py
+python3 ./datasets/build_nsfw_data.py
+python3 ./datasets/build_forma_data.py
+python3 ./datasets/build_forma55k_data.py
+```
+
+This will use the `~/storage/shared/deeplab/datasets` folder, which contains the following:
+- `~/storage/shared/deeplab/datasets/DATASET_NAME/dataset_split`: describes train, trainval, val splits
+- `~/storage/shared/deeplab/datasets/DATASET_NAME/tfrecord`: stores datasets as TFRecord
 
 If creating a custom dataset:
 1. Read http://hellodfan.com/2018/07/06/DeepLabv3-with-own-dataset/
@@ -28,11 +40,20 @@ If creating a custom dataset:
 1. (Optional) Add this dataset to `Forma54k` in `datasets/build_forma_data.py`
 
 ## Training
-
+Create and activate a venv for `tensorflow-gpu==1.15`:
 ```
 cd ~/tensorflow/models/research/deeplab
+virtualenv venv
+source venv/bin/activate
+python3 -m pip install tensorflow-gpu==1.15
+```
+Train:
+```
+cd ~/tensorflow/models/research/deeplab
+source venv/bin/activate
 sh local_test_forma.sh
 
+source venv/bin/activate
 tensorboard --logdir=~/storage/shared/deeplab/experiments
 ```
 
