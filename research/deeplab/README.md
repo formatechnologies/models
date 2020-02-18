@@ -22,8 +22,10 @@ Build existing Forma datasets (requires `tensorflow-gpu==2.0.0`, like `iris`):
 python3 ./datasets/build_imaterialist_data.py
 python3 ./datasets/build_human_parsing_data.py
 python3 ./datasets/build_nsfw_data.py
+python3 ./datasets/build_tryon1k_data.py
 python3 ./datasets/build_forma_data.py
 python3 ./datasets/build_forma55k_data.py
+python3 ./datasets/build_forma54k_tryon1k_data.py
 ```
 
 This will use the `~/storage/shared/deeplab/datasets` folder, which contains the following:
