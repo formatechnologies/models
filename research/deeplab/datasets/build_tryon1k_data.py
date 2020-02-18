@@ -64,7 +64,7 @@ import cv2
 
 from iris.utility.paths import STORAGE_DIR
 from iris.utility.json_tools import load_dict_from_json
-from iris.utility.misc import to_np_uint8
+from iris.utility.misc import to_np_uint8, to_np_float32
 
 from iris.image_analysis.deeplab import DeepLabModel
 
@@ -184,9 +184,9 @@ def _convert_dataset(dataset_split):
 
                 # from experiment.pipeline.debug import dump_dict, plot, plot_mesh, plot_landmarks, overlay_masks, plot_pts
                 # import matplotlib.pyplot as plt; plt.ion()
-                # info = decode_segmentation_exclusive(seg, seg_name_to_label)
+                # info = decode_segmentation_exclusive(seg[:, :, 0], seg_name_to_label)
                 # vis = deeplab_segmentation(image, info)
-                # plot(vis)
+                # plot(np.hstack((to_np_float32(image), vis)))
                 # import pdb; pdb.set_trace()
 
                 if height != seg_height or width != seg_width:
