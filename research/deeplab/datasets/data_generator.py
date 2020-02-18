@@ -116,21 +116,31 @@ _HUMANPARSING17K_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
-_FORMA54K_INFORMATION = DatasetDescriptor(
-    splits_to_sizes={
-        'train': 43770,
-        'trainval': 5472,
-        'val': 5472,
-    },
-    num_classes=9,
-    ignore_label=255,
-)
-
 _NSFW1K_INFORMATION = DatasetDescriptor(
     splits_to_sizes={
         'train': 1000,
         'trainval': 100,
         'val': 1,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
+_TRYON1K_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 1000,
+        'trainval': 100,
+        'val': 72,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
+_FORMA54K_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 43770,
+        'trainval': 5472,
+        'val': 5472,
     },
     num_classes=9,
     ignore_label=255,
@@ -146,15 +156,28 @@ _FORMA55K_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
+_FORMA54K_TRYON1K_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 44770,
+        'trainval': 5572,
+        'val': 5544,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
+
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
     'pascal_voc_seg': _PASCAL_VOC_SEG_INFORMATION,
     'ade20k': _ADE20K_INFORMATION,
     'imaterialist37k': _IMATERIALIST37K_INFORMATION,
     'humanparsing17k': _HUMANPARSING17K_INFORMATION,
-    'forma54k': _FORMA54K_INFORMATION,
     'nsfw1k': _NSFW1K_INFORMATION,
+    'tryon1k': _TRYON1K_INFORMATION,
+    'forma54k': _FORMA54K_INFORMATION,
     'forma55k': _FORMA55K_INFORMATION,
+    'forma54k_tryon1k': _FORMA54K_TRYON1K_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
