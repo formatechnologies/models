@@ -37,7 +37,6 @@ If creating a custom dataset:
 1. Copy a `datasets/build_XXX_data.py` script to create TFRecords
 1. Add a `DatasetDescriptor` in `datasets/data_generator.py`
 1. (Optional) Add a label colormap in `utils/get_dataset_colormap.py`
-1. Modify `local_test_forma.sh` to call `python3 datasets/build_XXX_data.py` to build dataset
 1. Modify `local_test_forma.sh` with the correct `DATASET_NAME` and other parameters for training
 1. (Optional) Add this dataset to `Forma54k` in `datasets/build_forma_data.py`
 
