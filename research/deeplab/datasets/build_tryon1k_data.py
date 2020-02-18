@@ -108,7 +108,7 @@ def find_max_dimensions():
         max_h = max(max_h, h)
         max_w = max(max_w, w)
     print(max_h, max_w)
-    # nsfw1k: (4000, 4000)
+    # tryon1k: (1000, 1334)
 
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
