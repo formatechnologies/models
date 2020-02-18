@@ -68,11 +68,12 @@ from iris.utility.misc import to_np_uint8
 
 from iris.image_analysis.deeplab import DeepLabModel
 
-DATASET_NAME = 'nsfw1k'
+DATASET_NAME = 'tryon1k'
 
 DATASETS_INPUT_DIR = os.path.join(STORAGE_DIR, 'dennis/datasets')
 DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
 DATASET_INPUT_DATA = os.path.join(DATASET_INPUT_DIR, 'data')
+DATASET_INPUT_LABEL = os.path.join(DATASET_INPUT_DIR, 'label')
 
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
@@ -171,25 +172,13 @@ def _convert_dataset(dataset_split):
                 # Read the image.
                 image_filename = filenames[i]
                 image = cv2.imread(image_filename)
-                if image is None:
-                    continue
                 image_data = to_image_bytestring(image, '.jpg')
                 height, width = image.shape[:2]
 
                 # Read the semantic segmentation annotation.
-                image_ds = reduce_image_size(image, max_height=1000, max_width=1000)
-                seg_dict = deeplab_model.run(image_ds)
-                seg_dict['seg_skin'] = np.maximum(seg_dict['seg_skin'], seg_dict['seg_garment'])
-                seg_dict['seg_garment'] = np.zeros_like(seg_dict['seg_garment'])
-                seg_dict['seg_background'] = get_seg_background(seg_dict)
-                if image_ds.shape != image.shape:
-                    seg_dict = {
-                        k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST)
-                        for k, v in seg_dict.items()
-                    }
-
-                seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
-                seg = seg[:, :, np.newaxis].repeat(3, axis=2)
+                uuid = os.path.splitext(os.path.basename(image_filename))[0]
+                seg_filename = os.path.join(DATASET_INPUT_LABEL, f'{uuid}.png')
+                seg = cv2.imread(seg_filename)
                 seg_data = to_image_bytestring(seg, '.png')
                 seg_height, seg_width = seg.shape[:2]
 
