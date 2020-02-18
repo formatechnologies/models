@@ -182,6 +182,13 @@ def _convert_dataset(dataset_split):
                 seg_data = to_image_bytestring(seg, '.png')
                 seg_height, seg_width = seg.shape[:2]
 
+                # from experiment.pipeline.debug import dump_dict, plot, plot_mesh, plot_landmarks, overlay_masks, plot_pts
+                # import matplotlib.pyplot as plt; plt.ion()
+                # info = decode_segmentation_exclusive(seg, seg_name_to_label)
+                # vis = deeplab_segmentation(image, info)
+                # plot(vis)
+                # import pdb; pdb.set_trace()
+
                 if height != seg_height or width != seg_width:
                     raise RuntimeError('Shape mismatched between image and label.')
 
@@ -192,56 +199,20 @@ def _convert_dataset(dataset_split):
                 tfrecord_writer.write(example.SerializeToString())
 
 
-def encode_segmentation(seg_dict, encode_dict):
-    # Encode up to 8 segmentation images via bits of np.uint8
-    image = np.zeros(next(iter(seg_dict.values())).shape, np.uint8)
-    for seg_name, bits in encode_dict.items():
-        seg = seg_dict[seg_name]
-        seg = (seg > 128).astype(np.uint8)
-        seg_bits = np.left_shift(seg, bits)
-        image += seg_bits
-    return image
-
-
 def encode_segmentation_exclusive(seg_dict, encode_dict):
     # Encode up to 8 segmentation images via bits of np.uint8
     image = np.zeros(next(iter(seg_dict.values())).shape, np.uint8)
     for seg_name, bits in encode_dict.items():
-        seg = seg_dict[seg_name]
-        image[seg > 128] = bits
+        image[seg_dict[seg_name] > 128] = bits
     return image
-
-
-def decode_segmentation(image, decode_dict):
-    # Assumes image has enough channels to support different bit channels for decode_dict
-    seg_dict = {}
-    bit_mask = np.ones(image.shape[:2], image.dtype)
-    for seg_name, bits in decode_dict.items():
-        seg_dict[seg_name] = (image & (np.left_shift(bit_mask, bits)) > 0).astype(np.uint8) * 255
-    return seg_dict
 
 
 def decode_segmentation_exclusive(image, decode_dict):
     # Assumes image has enough channels to support different bit channels for decode_dict
     seg_dict = {}
-    bit_mask = np.ones(image.shape[:2], image.dtype)
     for seg_name, bits in decode_dict.items():
         seg_dict[seg_name] = (image == bits).astype(np.uint8) * 255
     return seg_dict
-
-
-def reduce_image_size(image, max_height=1000, max_width=1000):
-    """
-    Reduce an numpy array image to a certain max size
-    """
-    h, w, _ = image.shape
-
-    ratio_h = h / max_height
-    ratio_w = w / max_width
-    ratio = max(ratio_h, ratio_w)
-    if ratio < 1:
-        return image
-    return cv2.resize(image, (int(w / ratio), int(h / ratio)), interpolation=cv2.INTER_AREA)
 
 
 def to_image_bytestring(arr, ext='.png'):
@@ -256,11 +227,31 @@ def to_image_bytestring(arr, ext='.png'):
     return arr_jpg.tostring()
 
 
-def get_seg_background(seg_dict):
-    image = 255 * np.ones(next(iter(seg_dict.values())).shape, np.uint8)
-    for seg in seg_dict.values():
-        image[seg > 128] = 0
-    return image
+def deeplab_segmentation(image, info):
+    image = image / np.float32(255)
+    seg_body = convert_seg(
+        info['seg_body'] - info['seg_skin'] - info['seg_garment'] - info['seg_hair'], (1, 0, 0)
+    )
+    seg_skin = convert_seg(info['seg_skin'] - info['seg_arms'], (0, 0, 1))
+    seg_garment = convert_seg(
+        info['seg_garment'] - info['seg_sleeves'] - info['seg_pants'] - info['seg_shoe'], (0, 1, 0)
+    )
+    seg_hair = convert_seg(info['seg_hair'], (0, 1, 1))
+    seg_arms = convert_seg(info['seg_arms'], (1, 0, 1))
+    seg_shoe = convert_seg(info['seg_shoe'], (1, 1, 0))
+    seg_sleeves = convert_seg(info['seg_sleeves'], (1, 1, 1))
+    seg_pants = convert_seg(info['seg_pants'], (0.5, 0.5, 0.5))
+
+    output_image = 0.5 * image + 0.5 * (
+        seg_body + seg_skin + seg_garment + seg_hair + seg_shoe + seg_arms + seg_sleeves + seg_pants
+    )
+    return output_image.clip(0, 1)
+
+
+def convert_seg(seg, color):
+    return (seg / np.float32(255))[:, :, np.newaxis].repeat(3, axis=2) * np.array(
+        color, np.float32
+    ).reshape((1, 1, 3))
 
 
 def main(unused_argv):
