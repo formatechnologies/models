@@ -19,12 +19,12 @@ sh local_test.sh
 ## Dataset Creation
 Build existing Forma datasets (requires `tensorflow-gpu==2.0.0`, like `iris`):
 ```
-python3 ./datasets/build_imaterialist_data.py
-python3 ./datasets/build_human_parsing_data.py
-python3 ./datasets/build_nsfw_data.py
+python3 ./datasets/build_imaterialist37k_data.py
+python3 ./datasets/build_humanparsing17k_data.py
+python3 ./datasets/build_nsfw1k_data.py
 python3 ./datasets/build_tryon1k_data.py
-python3 ./datasets/build_forma_data.py
-python3 ./datasets/build_forma55k_data.py
+python3 ./datasets/build_forma54k_data.py
+python3 ./datasets/build_forma54k_nsfw1k_data.py
 python3 ./datasets/build_forma54k_tryon1k_data.py
 ```
 
