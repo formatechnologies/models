@@ -47,6 +47,7 @@ cd ~/tensorflow/models/research/deeplab
 virtualenv venv
 source venv/bin/activate
 python3 -m pip install tensorflow-gpu==1.15
+python3 -m pip install Pillow==7.0.0
 ```
 Train:
 ```
