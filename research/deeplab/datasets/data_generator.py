@@ -166,6 +166,16 @@ _FORMA54K_TRYON1K_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
+_FORMA54K_NSFW1K_TRYON1K_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 45770,
+        'trainval': 5672,
+        'val': 5545,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
 
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
@@ -178,6 +188,7 @@ _DATASETS_INFORMATION = {
     'forma54k': _FORMA54K_INFORMATION,
     'forma55k': _FORMA55K_INFORMATION,
     'forma54k_tryon1k': _FORMA54K_TRYON1K_INFORMATION,
+    'forma54k_nsfw1k_tryon1k': _FORMA54K_NSFW1K_TRYON1K_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
