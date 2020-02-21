@@ -90,12 +90,10 @@ FINE_TUNE_BATCH_NORM=false
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
-# TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8383"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/forma54k_2019-09-27_num_epochs_40_base_learning_rate_0.01_learning_rate_decay_0.1^2_abq-gpu-2_dennis/model.ckpt-109425"
-# TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8428"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2019-10-01_num_epochs_100_train_batch_size_32_train_crop_size_513,513_tf_initial_checkpoint_forma54k_0.8383_abq-gpu-2_dennis_forma54k/model.ckpt-136781"
-TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8490"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2019-10-01_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_0.8383_abq-gpu-1_dennis_forma54k/model.ckpt-136781"
+# TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8490"
+# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2019-10-01_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_0.8383_abq-gpu-1_dennis_forma54k/model.ckpt-136781"
+TF_INITIAL_CHECKPOINT_NAME="forma54k_nsfw1k_0.8481"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-02-11_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_0.8490_abq-gpu-1_dennis_forma55k/model.ckpt-139906"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
