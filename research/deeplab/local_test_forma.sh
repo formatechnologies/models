@@ -102,10 +102,8 @@ FINE_TUNE_BATCH_NORM=false
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
-# TF_INITIAL_CHECKPOINT_NAME="forma54k_0.8490"
-# TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2019-10-01_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_0.8383_abq-gpu-1_dennis_forma54k/model.ckpt-136781"
-TF_INITIAL_CHECKPOINT_NAME="forma54k_nsfw1k_0.8481"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-02-11_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_0.8490_abq-gpu-1_dennis_forma55k/model.ckpt-139906"
+TF_INITIAL_CHECKPOINT_NAME="forma54k_nsfw1k_0.8543"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-02-20_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_nsfw1k_0.8481_abq-gpu-1_dennis_forma54k_tryon1k/model.ckpt-139906"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
