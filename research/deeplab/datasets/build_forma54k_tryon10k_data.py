@@ -9,8 +9,8 @@ from iris.utility.paths import STORAGE_DIR
 DEEPLAB_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab')
 DATASETS_DIR = os.path.join(DEEPLAB_DIR, 'datasets')
 
-dataset_name_list = ['forma54k', 'tryon1k']
-dataset_name_forma = 'forma54k_tryon1k'
+dataset_name_list = ['forma54k', 'tryon10k']
+dataset_name_forma = 'forma54k_tryon10k'
 dataset_splits = ['train', 'trainval', 'val']
 
 DATASET_FORMA_DIR = os.path.join(DATASETS_DIR, dataset_name_forma)
