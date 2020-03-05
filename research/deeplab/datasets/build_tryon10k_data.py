@@ -68,7 +68,7 @@ from iris.utility.misc import to_np_uint8, to_np_float32
 
 from iris.image_analysis.deeplab import DeepLabModel
 
-DATASET_NAME = 'tryon1k'
+DATASET_NAME = 'tryon10k'
 
 DATASETS_INPUT_DIR = os.path.join(STORAGE_DIR, 'dennis/datasets')
 DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
@@ -108,14 +108,14 @@ def find_max_dimensions():
         max_h = max(max_h, h)
         max_w = max(max_w, w)
     print(max_h, max_w)
-    # tryon1k: (1000, 1334)
+    # tryon10k: (1000, 800)
 
 
 def _create_dataset_splits(data_dir, dataset_split_dir):
     filenames = sorted(glob.glob(data_dir + '/*'))
 
-    train_split = 1000
-    valid_split = 1100
+    train_split = 10000
+    valid_split = 10000
 
     if not os.path.exists(dataset_split_dir):
         os.mkdir(dataset_split_dir)
