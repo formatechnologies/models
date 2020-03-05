@@ -23,9 +23,12 @@ python3 ./datasets/build_imaterialist37k_data.py
 python3 ./datasets/build_humanparsing17k_data.py
 python3 ./datasets/build_nsfw1k_data.py
 python3 ./datasets/build_tryon1k_data.py
+python3 ./datasets/build_tryon10k_data.py
 python3 ./datasets/build_forma54k_data.py
 python3 ./datasets/build_forma54k_nsfw1k_data.py
 python3 ./datasets/build_forma54k_tryon1k_data.py
+python3 ./datasets/build_forma54k_nsfw1k_tryon1k_data.py
+python3 ./datasets/build_forma54k_tryon10k_data.py
 ```
 
 This will use the `~/storage/shared/deeplab/datasets` folder, which contains the following:
