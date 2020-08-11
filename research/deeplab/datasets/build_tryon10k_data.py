@@ -68,12 +68,14 @@ from iris.utility.misc import to_np_uint8, to_np_float32
 
 from iris.image_analysis.deeplab import DeepLabModel
 
-DATASET_NAME = 'tryon10k'
+DATASET_INPUT_NAME = 'tryon10k'
+DATASET_NAME = 'tryon10k_landmarks'
 
 DATASETS_INPUT_DIR = os.path.join(STORAGE_DIR, 'dennis/datasets')
-DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_NAME)
+DATASET_INPUT_DIR = os.path.join(DATASETS_INPUT_DIR, DATASET_INPUT_NAME)
 DATASET_INPUT_DATA = os.path.join(DATASET_INPUT_DIR, 'data')
 DATASET_INPUT_LABEL = os.path.join(DATASET_INPUT_DIR, 'label')
+DATASET_INPUT_LANDMARK = os.path.join(DATASET_INPUT_DIR, 'landmark')
 
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
@@ -142,7 +144,7 @@ def _convert_dataset(dataset_split):
 
     dataset = os.path.basename(dataset_split)[:-4]
     sys.stdout.write('\nProcessing ' + dataset + '\n')
-    filenames = [x.strip('\n') for x in open(dataset_split, 'r')]
+    filenames = sorted([x.strip('\n') for x in open(dataset_split, 'r')])
     num_images = len(filenames)
     num_shards = int(math.ceil(num_images / float(_NUM_PER_SHARD)))
 
@@ -192,9 +194,14 @@ def _convert_dataset(dataset_split):
                 if height != seg_height or width != seg_width:
                     raise RuntimeError('Shape mismatched between image and label.')
 
+                # Read the landmarks data.
+                landmark_filename = os.path.join(DATASET_INPUT_LANDMARK, f'{uuid}.json')
+                info = load_dict_from_json(landmark_filename)
+                landmarks = info['pose_landmarks']
+
                 # Convert to tf example.
                 example = build_data.image_seg_to_tfexample(
-                    image_data, filenames[i], height, width, seg_data
+                    image_data, filenames[i], height, width, seg_data, landmarks=landmarks
                 )
                 tfrecord_writer.write(example.SerializeToString())
 
