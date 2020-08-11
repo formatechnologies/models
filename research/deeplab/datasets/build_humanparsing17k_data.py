@@ -226,9 +226,9 @@ def _convert_dataset(dataset_split):
 
         # Read the landmarks data.
         landmark_filename = os.path.join(HUMAN_PARSING_LANDMARK_LANDMARK_DIR, f'{filenames[i]}.json')
-        if not os.path.exists(landmark_filename):
-          continue
         info = load_dict_from_json(landmark_filename)
+        if info['status'] == 'failure':
+          continue
         landmarks = info['pose_landmarks']
 
         # Convert to tf example.
