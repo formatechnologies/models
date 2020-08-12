@@ -142,6 +142,9 @@ def _bytes_list_feature(values):
   Returns:
     A TF-Feature.
   """
+  if isinstance(values, type(tf.constant(0))):
+      values = values.numpy()
+
   def norm2bytes(value):
     return value.encode() if isinstance(value, str) and six.PY3 else value
 
@@ -149,7 +152,7 @@ def _bytes_list_feature(values):
       bytes_list=tf.train.BytesList(value=[norm2bytes(values)]))
 
 
-def image_seg_to_tfexample(image_data, filename, height, width, seg_data, landmarks=None):
+def image_seg_to_tfexample(image_data, filename, height, width, seg_data, landmarks_data=None):
   """Converts one image/segmentation pair to tf example.
 
   Args:
@@ -162,9 +165,6 @@ def image_seg_to_tfexample(image_data, filename, height, width, seg_data, landma
   Returns:
     tf example of one image/segmentation pair.
   """
-  if landmarks is not None:
-    landmarks = landmarks.flatten().tolist()
-
   return tf.train.Example(features=tf.train.Features(feature={
       'image/encoded': _bytes_list_feature(image_data),
       'image/filename': _bytes_list_feature(filename),
@@ -177,5 +177,5 @@ def image_seg_to_tfexample(image_data, filename, height, width, seg_data, landma
           _bytes_list_feature(seg_data)),
       'image/segmentation/class/format': _bytes_list_feature(
           FLAGS.label_format),
-      'image/landmarks': _float_list_feature(landmarks),
+      'image/landmarks': _bytes_list_feature(landmarks_data),
   }))

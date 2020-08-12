@@ -230,10 +230,11 @@ def _convert_dataset(dataset_split):
         if info['status'] == 'failure':
           continue
         landmarks = info['pose_landmarks']
+        landmarks_data = tf.io.serialize_tensor(landmarks.astype(np.float32))
 
         # Convert to tf example.
         example = build_data.image_seg_to_tfexample(
-            image_data, filenames[i], height, width, seg_data, landmarks=landmarks)
+            image_data, filenames[i], height, width, seg_data, landmarks_data=landmarks_data)
         tfrecord_writer.write(example.SerializeToString())
 
 def reduce_image_size2(image, max_height=1000, max_width=1000):

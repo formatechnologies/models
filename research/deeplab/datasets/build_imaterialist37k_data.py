@@ -180,10 +180,11 @@ def _convert_dataset(dataset_split):
 
         # Read the landmarks data.
         landmarks = example['pose_landmarks']
+        landmarks_data = tf.io.serialize_tensor(landmarks.astype(np.float32))
 
         # Convert to tf example.
         example = build_data.image_seg_to_tfexample(
-            image_data, filenames[i], height, width, seg_data, landmarks=landmarks)
+            image_data, filenames[i], height, width, seg_data, landmarks_data=landmarks_data)
         tfrecord_writer.write(example.SerializeToString())
 
 def encode_segmentation(seg_dict, encode_dict):

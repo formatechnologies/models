@@ -198,10 +198,11 @@ def _convert_dataset(dataset_split):
                 landmark_filename = os.path.join(DATASET_INPUT_LANDMARK, f'{uuid}.json')
                 info = load_dict_from_json(landmark_filename)
                 landmarks = info['pose_landmarks']
+                landmarks_data = tf.io.serialize_tensor(landmarks.astype(np.float32))
 
                 # Convert to tf example.
                 example = build_data.image_seg_to_tfexample(
-                    image_data, filenames[i], height, width, seg_data, landmarks=landmarks
+                    image_data, filenames[i], height, width, seg_data, landmarks_data=landmarks_data
                 )
                 tfrecord_writer.write(example.SerializeToString())
 

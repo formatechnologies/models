@@ -351,7 +351,7 @@ class Dataset(object):
         'image/segmentation/class/format':
             tf.FixedLenFeature((), tf.string, default_value='png'),
         'image/landmarks':
-            tf.FixedLenFeature((), tf.float32, default_value=0.0),
+            tf.FixedLenFeature((), tf.string, default_value=''),
     }
 
     parsed_features = tf.parse_single_example(example_proto, features)
@@ -367,8 +367,7 @@ class Dataset(object):
     if image_name is None:
       image_name = tf.constant('')
 
-    landmarks = parsed_features['image/landmarks']
-    landmarks = tf.reshape(landmarks, (None, 18, 3))
+    landmarks = tf.parse_tensor(parsed_features['image/landmarks'], out_type=tf.float32)
 
     sample = {
         common.IMAGE: image,
