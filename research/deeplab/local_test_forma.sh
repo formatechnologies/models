@@ -74,7 +74,11 @@ EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 # DATASET_EVAL_CROP_SIZE="4001,4001" # Max image dimensions + 1
 # DATASET_TRAIN_SIZE=45770
 
-DATASET_NAME='forma54k_tryon10k'
+# DATASET_NAME='forma54k_tryon10k'
+# DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=53770
+
+DATASET_NAME='forma54k_tryon10k_landmarks'
 DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
 DATASET_TRAIN_SIZE=53770
 
