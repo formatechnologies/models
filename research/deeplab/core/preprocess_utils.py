@@ -448,6 +448,25 @@ def resolve_shape(tensor, rank=None, scope=None):
     return shape
 
 
+def half_plane_mask(image, p1, p2):
+  shape = tf.shape(image)
+  h, w = shape[0], shape[1]
+  X, Y = tf.meshgrid(tf.range(w, dtype=tf.int32), tf.range(h, dtype=tf.int32))
+  X, Y = tf.cast(X, tf.float32), tf.cast(Y, tf.float32)
+  x1, y1 = p1[0], p1[1]
+  x2, y2 = p2[0], p2[1]
+  m = (y2 - y1) / (x2 - x1)
+  mask = tf.cast((Y - y1) <= m * (X - x1), dtype=tf.float32)  # lower y-values = higher in image
+
+  mask.set_shape((None, None))
+  mask = tf.expand_dims(mask, axis=2)
+  shape = tf.shape(mask)
+  h, w = shape[0], shape[1]
+  mask = tf.image.resize(mask, [2*h, 2*w], tf.image.ResizeMethod.BILINEAR)
+  mask = tf.image.resize(mask, [h, w], tf.image.ResizeMethod.AREA, align_corners=True)
+  return mask
+
+
 def resize_to_range(image,
                     label=None,
                     min_size=None,

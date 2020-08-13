@@ -83,6 +83,20 @@ def preprocess_image_and_label(image,
   if label is not None:
     label = tf.cast(label, tf.int32)
 
+  # Crop image and label using landmarks
+  landmarks = landmarks[0]
+  rhip = landmarks[8, :2]
+  rknee = landmarks[9, :2]
+  lhip = landmarks[11, :2]
+  lknee = landmarks[12, :2]
+  t = tf.random.uniform((2,), minval=0.3, maxval=0.7)
+  p1 = t[0] * rhip + (1 - t[0]) * rknee
+  p2 = t[1] * lhip + (1 - t[1]) * lknee
+  upper_body_mask = preprocess_utils.half_plane_mask(image, p1, p2)
+  processed_image = tf.cast(tf.cast(processed_image, np.float32) * upper_body_mask, tf.uint8)
+  if label is not None:
+    label *= tf.cast(upper_body_mask > 0.5, tf.int32)
+
   # Resize image and label to the desired range.
   if min_resize_value or max_resize_value:
     [processed_image, label] = (
