@@ -83,7 +83,10 @@ def preprocess_image_and_label(image,
   if label is not None:
     label = tf.cast(label, tf.int32)
 
-  # Crop image and label using landmarks
+  # Crop image and label using landmarks, padding cropped areas with mean_pixel and ignore_label
+  mean_pixel = tf.reshape(
+      feature_extractor.mean_pixel(model_variant), [1, 1, 3])
+
   landmarks = landmarks[0]
   rhip = landmarks[8, :2]
   rknee = landmarks[9, :2]
@@ -93,9 +96,12 @@ def preprocess_image_and_label(image,
   p1 = t[0] * rhip + (1 - t[0]) * rknee
   p2 = t[1] * lhip + (1 - t[1]) * lknee
   upper_body_mask = preprocess_utils.half_plane_mask(image, p1, p2)
-  processed_image = tf.cast(tf.cast(processed_image, np.float32) * upper_body_mask, tf.uint8)
+  processed_image = tf.cast(processed_image, tf.float32)
+  processed_image = upper_body_mask * processed_image + (1 - upper_body_mask) * mean_pixel
+  processed_image = tf.cast(processed_image, tf.uint8)
   if label is not None:
-    label *= tf.cast(upper_body_mask > 0.5, tf.int32)
+    upper_body_mask_bin = tf.cast(upper_body_mask > 0.5, tf.int32)
+    label = upper_body_mask_bin * label + (1 - upper_body_mask_bin) * ignore_label
 
   # Resize image and label to the desired range.
   if min_resize_value or max_resize_value:
@@ -127,8 +133,6 @@ def preprocess_image_and_label(image,
   target_width = image_width + tf.maximum(crop_width - image_width, 0)
 
   # Pad image with mean pixel value.
-  mean_pixel = tf.reshape(
-      feature_extractor.mean_pixel(model_variant), [1, 1, 3])
   processed_image = preprocess_utils.pad_to_bounding_box(
       processed_image, 0, 0, target_height, target_width, mean_pixel)
 
