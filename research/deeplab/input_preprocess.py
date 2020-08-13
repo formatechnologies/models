@@ -89,7 +89,7 @@ def preprocess_image_and_label(image,
   rknee = landmarks[9, :2]
   lhip = landmarks[11, :2]
   lknee = landmarks[12, :2]
-  t = tf.random.uniform((2,), minval=0.3, maxval=0.7)
+  t = tf.random.uniform((2,), minval=0.4, maxval=0.6)
   p1 = t[0] * rhip + (1 - t[0]) * rknee
   p2 = t[1] * lhip + (1 - t[1]) * lknee
   upper_body_mask = preprocess_utils.half_plane_mask(image, p1, p2)
