@@ -411,7 +411,6 @@ class Dataset(object):
     original_image, image, label = input_preprocess.preprocess_image_and_label(
         image=image,
         label=label,
-        landmarks=landmarks,
         crop_height=self.crop_size[0],
         crop_width=self.crop_size[1],
         min_resize_value=self.min_resize_value,
@@ -422,7 +421,8 @@ class Dataset(object):
         scale_factor_step_size=self.scale_factor_step_size,
         ignore_label=self.ignore_label,
         is_training=self.is_training,
-        model_variant=self.model_variant)
+        model_variant=self.model_variant,
+        landmarks=landmarks)
 
     sample[common.IMAGE] = image
 

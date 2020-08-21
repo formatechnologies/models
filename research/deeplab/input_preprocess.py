@@ -27,7 +27,6 @@ _PROB_OF_FLIP = 0.5
 
 def preprocess_image_and_label(image,
                                label,
-                               landmarks,
                                crop_height,
                                crop_width,
                                min_resize_value=None,
@@ -38,7 +37,8 @@ def preprocess_image_and_label(image,
                                scale_factor_step_size=0,
                                ignore_label=255,
                                is_training=True,
-                               model_variant=None):
+                               model_variant=None,
+                               landmarks=None):
   """Preprocesses the image and label.
 
   Args:
@@ -86,7 +86,7 @@ def preprocess_image_and_label(image,
   # Crop image and label using landmarks, padding cropped areas with mean_pixel and ignore_label
   mean_pixel = tf.reshape(
       feature_extractor.mean_pixel(model_variant), [1, 1, 3])
-  if is_training:
+  if is_training and landmarks is not None:
     processed_image, label = tf.cond(
         tf.random.uniform([], 0, 1) < 0.2,
         lambda: preprocess_utils.random_crop_legs(processed_image, label,
