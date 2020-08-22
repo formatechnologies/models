@@ -88,7 +88,7 @@ def preprocess_image_and_label(image,
       feature_extractor.mean_pixel(model_variant), [1, 1, 3])
   if is_training and landmarks is not None:
     processed_image, label = tf.cond(
-        tf.random.uniform([], 0, 1) < 0.2,
+        tf.math.logical_and(tf.math.not_equal(landmarks, ''), tf.random.uniform([], 0, 1) < 0.2),
         lambda: preprocess_utils.random_crop_legs(processed_image, label,
             landmarks, mean_pixel, ignore_label),
         lambda: (processed_image, label))

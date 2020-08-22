@@ -367,14 +367,12 @@ class Dataset(object):
     if image_name is None:
       image_name = tf.constant('')
 
-    landmarks = tf.parse_tensor(parsed_features['image/landmarks'], out_type=tf.float32)
-
     sample = {
         common.IMAGE: image,
         common.IMAGE_NAME: image_name,
         common.HEIGHT: parsed_features['image/height'],
         common.WIDTH: parsed_features['image/width'],
-        common.LANDMARKS: landmarks,
+        common.LANDMARKS: parsed_features['image/landmarks'],
     }
 
     if label is not None:

@@ -449,6 +449,7 @@ def resolve_shape(tensor, rank=None, scope=None):
 
 
 def random_crop_legs(image, label, landmarks, mean_pixel, ignore_label):
+  landmarks = tf.parse_tensor(landmarks, out_type=tf.float32)
   landmarks = landmarks[0]
   rhip = landmarks[8, :2]
   rknee = landmarks[9, :2]
