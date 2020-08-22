@@ -459,6 +459,13 @@ def main(unused_argv):
           should_shuffle=True,
           should_repeat=True)
 
+      # # Debug code for testing dataset augmentation
+      # iterator = dataset.get_one_shot_iterator()
+      # sample = iterator.get_next()
+      # with tf.Session() as sess:
+      #   x = sess.run([sample])
+      # import pdb; pdb.set_trace()
+
       train_tensor, summary_op = _train_deeplab_model(
           dataset.get_one_shot_iterator(), dataset.num_of_classes,
           dataset.ignore_label)
