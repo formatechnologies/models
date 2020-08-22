@@ -196,6 +196,16 @@ _FORMA54K_TRYON10K_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
+_FORMA54K_TRYON10K_LANDMARKS_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 53770,
+        'trainval': 5472,
+        'val': 5472,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
 
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
@@ -211,6 +221,7 @@ _DATASETS_INFORMATION = {
     'forma54k_nsfw1k_tryon1k': _FORMA54K_NSFW1K_TRYON1K_INFORMATION,
     'tryon10k': _TRYON10K_INFORMATION,
     'forma54k_tryon10k': _FORMA54K_TRYON10K_INFORMATION,
+    'forma54k_tryon10k_landmarks': _FORMA54K_TRYON10K_LANDMARKS_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
@@ -339,6 +350,8 @@ class Dataset(object):
             tf.FixedLenFeature((), tf.string, default_value=''),
         'image/segmentation/class/format':
             tf.FixedLenFeature((), tf.string, default_value='png'),
+        'image/landmarks':
+            tf.FixedLenFeature((), tf.string, default_value=''),
     }
 
     parsed_features = tf.parse_single_example(example_proto, features)
@@ -359,6 +372,7 @@ class Dataset(object):
         common.IMAGE_NAME: image_name,
         common.HEIGHT: parsed_features['image/height'],
         common.WIDTH: parsed_features['image/width'],
+        common.LANDMARKS: parsed_features['image/landmarks'],
     }
 
     if label is not None:
@@ -390,6 +404,7 @@ class Dataset(object):
     """
     image = sample[common.IMAGE]
     label = sample[common.LABELS_CLASS]
+    landmarks = sample[common.LANDMARKS]
 
     original_image, image, label = input_preprocess.preprocess_image_and_label(
         image=image,
@@ -404,7 +419,8 @@ class Dataset(object):
         scale_factor_step_size=self.scale_factor_step_size,
         ignore_label=self.ignore_label,
         is_training=self.is_training,
-        model_variant=self.model_variant)
+        model_variant=self.model_variant,
+        landmarks=landmarks)
 
     sample[common.IMAGE] = image
 

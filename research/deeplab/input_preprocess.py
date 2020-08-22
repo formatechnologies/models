@@ -37,7 +37,8 @@ def preprocess_image_and_label(image,
                                scale_factor_step_size=0,
                                ignore_label=255,
                                is_training=True,
-                               model_variant=None):
+                               model_variant=None,
+                               landmarks=None):
   """Preprocesses the image and label.
 
   Args:
@@ -82,6 +83,16 @@ def preprocess_image_and_label(image,
   if label is not None:
     label = tf.cast(label, tf.int32)
 
+  # Crop image and label using landmarks, padding cropped areas with mean_pixel and ignore_label
+  mean_pixel = tf.reshape(
+      feature_extractor.mean_pixel(model_variant), [1, 1, 3])
+  if is_training and landmarks is not None:
+    processed_image, label = tf.cond(
+        tf.math.logical_and(tf.math.not_equal(landmarks, ''), tf.random.uniform([], 0, 1) < 0.2),
+        lambda: preprocess_utils.random_crop_legs(processed_image, label,
+            landmarks, mean_pixel, ignore_label),
+        lambda: (processed_image, label))
+
   # Resize image and label to the desired range.
   if min_resize_value or max_resize_value:
     [processed_image, label] = (
@@ -112,8 +123,6 @@ def preprocess_image_and_label(image,
   target_width = image_width + tf.maximum(crop_width - image_width, 0)
 
   # Pad image with mean pixel value.
-  mean_pixel = tf.reshape(
-      feature_extractor.mean_pixel(model_variant), [1, 1, 3])
   processed_image = preprocess_utils.pad_to_bounding_box(
       processed_image, 0, 0, target_height, target_width, mean_pixel)
 

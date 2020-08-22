@@ -133,6 +133,7 @@ WIDTH = 'width'
 IMAGE_NAME = 'image_name'
 LABEL = 'label'
 ORIGINAL_IMAGE = 'original_image'
+LANDMARKS = 'landmarks'
 
 # Test set name.
 TEST_SET = 'test'

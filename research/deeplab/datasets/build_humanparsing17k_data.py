@@ -82,7 +82,10 @@ HUMAN_PARSING_IMAGE_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/human
 HUMAN_PARSING_LABEL_DIR = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/humanparsing/SegmentationClassAug/')
 HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'HumanParsing-Dataset/atr_label.txt')
 
-DATASET_NAME = 'humanparsing17k'
+HUMAN_PARSING_LANDMARK_DIR = os.path.join(DATASETS_DIR, 'HumanParsingLandmark')  # need permissions
+HUMAN_PARSING_LANDMARK_LANDMARK_DIR = os.path.join(HUMAN_PARSING_LANDMARK_DIR, 'landmark')
+
+DATASET_NAME = 'humanparsing17k_landmarks'
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
 DATASET_TFRECORD_DIR = os.path.join(DATASET_DIR, 'tfrecord')
@@ -151,7 +154,7 @@ def _convert_dataset(dataset_split):
   """
   dataset = os.path.basename(dataset_split)[:-4]
   sys.stdout.write('\nProcessing ' + dataset + '\n')
-  filenames = [x.strip('\n') for x in open(dataset_split, 'r')]
+  filenames = sorted([x.strip('\n') for x in open(dataset_split, 'r')])
   num_images = len(filenames)
   num_shards = int(math.ceil(num_images / float(_NUM_PER_SHARD)))
 
@@ -221,9 +224,17 @@ def _convert_dataset(dataset_split):
         if height != seg_height or width != seg_width:
           raise RuntimeError('Shape mismatched between image and label.')
 
+        # Read the landmarks data.
+        landmark_filename = os.path.join(HUMAN_PARSING_LANDMARK_LANDMARK_DIR, f'{filenames[i]}.json')
+        info = load_dict_from_json(landmark_filename)
+        if info['status'] == 'failure':
+          continue
+        landmarks = info['pose_landmarks']
+        landmarks_data = tf.io.serialize_tensor(landmarks.astype(np.float32))
+
         # Convert to tf example.
         example = build_data.image_seg_to_tfexample(
-            image_data, filenames[i], height, width, seg_data)
+            image_data, filenames[i], height, width, seg_data, landmarks_data=landmarks_data)
         tfrecord_writer.write(example.SerializeToString())
 
 def reduce_image_size2(image, max_height=1000, max_width=1000):

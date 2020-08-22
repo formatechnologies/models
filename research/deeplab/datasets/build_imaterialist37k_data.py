@@ -73,7 +73,7 @@ DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
 DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
 LABELS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
 
-DATASET_NAME = 'imaterialist37k'
+DATASET_NAME = 'imaterialist37k_landmarks'
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
 DATASET_TFRECORD_DIR = os.path.join(DATASET_DIR, 'tfrecord')
@@ -134,7 +134,7 @@ def _convert_dataset(dataset_split):
   """
   dataset = os.path.basename(dataset_split)[:-4]
   sys.stdout.write('\nProcessing ' + dataset + '\n')
-  filenames = [x.strip('\n') for x in open(dataset_split, 'r')]
+  filenames = sorted([x.strip('\n') for x in open(dataset_split, 'r')])
   num_images = len(filenames)
   num_shards = int(math.ceil(num_images / float(_NUM_PER_SHARD)))
 
@@ -178,9 +178,13 @@ def _convert_dataset(dataset_split):
         if height != seg_height or width != seg_width:
           raise RuntimeError('Shape mismatched between image and label.')
 
+        # Read the landmarks data.
+        landmarks = example['pose_landmarks']
+        landmarks_data = tf.io.serialize_tensor(landmarks.astype(np.float32))
+
         # Convert to tf example.
         example = build_data.image_seg_to_tfexample(
-            image_data, filenames[i], height, width, seg_data)
+            image_data, filenames[i], height, width, seg_data, landmarks_data=landmarks_data)
         tfrecord_writer.write(example.SerializeToString())
 
 def encode_segmentation(seg_dict, encode_dict):

@@ -117,6 +117,22 @@ def _int64_list_feature(values):
   return tf.train.Feature(int64_list=tf.train.Int64List(value=values))
 
 
+def _float_list_feature(values):
+  """Returns a TF-Feature of int64_list.
+
+  Args:
+    values: A scalar or list of values.
+
+  Returns:
+    A TF-Feature.
+  """
+  if not isinstance(values, collections.Iterable):
+    values = [values]
+
+  return tf.train.Feature(float_list=tf.train.FloatList(value=values))
+
+
+
 def _bytes_list_feature(values):
   """Returns a TF-Feature of bytes.
 
@@ -126,6 +142,9 @@ def _bytes_list_feature(values):
   Returns:
     A TF-Feature.
   """
+  if isinstance(values, type(tf.constant(0))):
+      values = values.numpy()
+
   def norm2bytes(value):
     return value.encode() if isinstance(value, str) and six.PY3 else value
 
@@ -133,7 +152,7 @@ def _bytes_list_feature(values):
       bytes_list=tf.train.BytesList(value=[norm2bytes(values)]))
 
 
-def image_seg_to_tfexample(image_data, filename, height, width, seg_data):
+def image_seg_to_tfexample(image_data, filename, height, width, seg_data, landmarks_data=None):
   """Converts one image/segmentation pair to tf example.
 
   Args:
@@ -158,4 +177,5 @@ def image_seg_to_tfexample(image_data, filename, height, width, seg_data):
           _bytes_list_feature(seg_data)),
       'image/segmentation/class/format': _bytes_list_feature(
           FLAGS.label_format),
+      'image/landmarks': _bytes_list_feature(landmarks_data),
   }))
