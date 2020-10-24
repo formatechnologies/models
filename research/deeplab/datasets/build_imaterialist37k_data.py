@@ -65,6 +65,7 @@ import cv2
 
 from iris.utility.paths import STORAGE_DIR
 from iris.utility.json_tools import load_dict_from_json
+from iris.utility.misc import multi_max
 
 
 _NUM_PER_SHARD = 500
@@ -73,7 +74,7 @@ DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
 DATA_DIR = os.path.join(DATASETS_DIR, 'json/train_json/')
 LABELS_FILE = os.path.join(DATASETS_DIR, 'imat-fashion/label_descriptions.json')
 
-DATASET_NAME = 'imaterialist37k_landmarks'
+DATASET_NAME = 'imaterialist37k_landmarks_seg_pants'
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
 DATASET_TFRECORD_DIR = os.path.join(DATASET_DIR, 'tfrecord')
@@ -168,7 +169,10 @@ def _convert_dataset(dataset_split):
         fashion_dict = decode_segmentation(example['seg_fashion_parsing'], fashion_names_to_bits)
         seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
         seg_dict['seg_sleeves'] = fashion_dict['sleeve']
-        seg_dict['seg_pants'] = np.maximum(fashion_dict['pants'], fashion_dict['shorts'])
+        seg_dict['seg_pants'] = multi_max([
+          fashion_dict[k] for k in ['pants', 'shorts', 'skirt', 'belt', 'tights, stockings']
+        ])
+        seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], fashion_dict['socks'])
         seg_dict['seg_background'] = get_seg_background(seg_dict)
         seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
         seg = seg[:, :, np.newaxis].repeat(3, axis=2)
