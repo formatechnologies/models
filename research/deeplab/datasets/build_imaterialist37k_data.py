@@ -172,7 +172,7 @@ def _convert_dataset(dataset_split):
         seg_dict['seg_pants'] = multi_max([
           fashion_dict[k] for k in ['pants', 'shorts', 'skirt', 'belt', 'tights, stockings']
         ])
-        seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], fashion_dict['socks'])
+        seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], fashion_dict['sock'])
         seg_dict['seg_background'] = get_seg_background(seg_dict)
         seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
         seg = seg[:, :, np.newaxis].repeat(3, axis=2)
