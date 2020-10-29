@@ -78,9 +78,13 @@ EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 # DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
 # DATASET_TRAIN_SIZE=53770
 
-DATASET_NAME='forma54k_tryon10k_landmarks'
+# DATASET_NAME='forma54k_tryon10k_landmarks'
+# DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=53770
+
+DATASET_NAME="imaterialist37k_landmarks_seg_pants"
 DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
-DATASET_TRAIN_SIZE=53770
+DATASET_TRAIN_SIZE=29606
 
 DATASET_DIR="${DATASETS_DIR}/${DATASET_NAME}"
 DATASET_TFRECORD="${DATASET_DIR}/tfrecord"
@@ -93,10 +97,15 @@ DATASET_SPLIT="${DATASET_DIR}/dataset_split"
 # TRAIN_BATCH_SIZE=1
 # FINE_TUNE_BATCH_NORM=false
 
-# GPU 1 + GPU 2 Workstation Settings
-NUM_CLONES=8
-# TRAIN_BATCH_SIZE=32
-TRAIN_BATCH_SIZE=8
+# # GPU 1 + GPU 2 Workstation Settings
+# NUM_CLONES=8
+# # TRAIN_BATCH_SIZE=32
+# TRAIN_BATCH_SIZE=8
+# FINE_TUNE_BATCH_NORM=false
+
+# GPU 1 Workstation Settings (Qianyi's House)
+NUM_CLONES=1
+TRAIN_BATCH_SIZE=1
 FINE_TUNE_BATCH_NORM=false
 
 # ========================== SETTINGS (INITIALIZATION) ==========================
@@ -106,8 +115,8 @@ FINE_TUNE_BATCH_NORM=false
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
-TF_INITIAL_CHECKPOINT_NAME="forma54k_tryon10k_0.8549"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-03-05_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_nsfw1k_0.8543_abq-gpu-1_dennis_forma54k_tryon10k/model.ckpt-168031"
+TF_INITIAL_CHECKPOINT_NAME="forma54k_tryon10k_landmarks_0.8565"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-08-13_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_tryon10k_0.8549_abq-gpu-2_dennis_forma54k_tryon10k_landmarks/model.ckpt-168031"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 

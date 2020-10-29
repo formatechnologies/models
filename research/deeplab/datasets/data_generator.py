@@ -206,6 +206,16 @@ _FORMA54K_TRYON10K_LANDMARKS_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
+_IMATERIALIST37K_LANDMARKS_SEG_PANTS_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 29606,
+        'trainval': 3701,
+        'val': 3701,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
 
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
@@ -222,6 +232,7 @@ _DATASETS_INFORMATION = {
     'tryon10k': _TRYON10K_INFORMATION,
     'forma54k_tryon10k': _FORMA54K_TRYON10K_INFORMATION,
     'forma54k_tryon10k_landmarks': _FORMA54K_TRYON10K_LANDMARKS_INFORMATION,
+    'imaterialist37k_landmarks_seg_pants': _IMATERIALIST37K_LANDMARKS_SEG_PANTS_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.
