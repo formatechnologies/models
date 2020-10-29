@@ -4,14 +4,14 @@
 
 ```
 cd ~
-mkdir tensorflow
-cd tensorflow
+mkdir formatechnologies
+cd formatechnologies
 git clone git@github.com:formatechnologies/models.git
 ```
 
 Test to see if the Pascal VOC pretrained model runs:
 ```
-cd ~/tensorflow/models/research/deeplab
+cd ~/formatechnologies/models/research/deeplab
 sh local_test.sh
 ```
 
@@ -88,7 +88,7 @@ Please see all DeepLab V3+ Hyperparameters described below, in `local_test_forma
 ### Train
 Create and activate a venv for `tensorflow-gpu==1.15`:
 ```
-cd ~/tensorflow/models/research/deeplab
+cd ~/formatechnlogies/models/research/deeplab
 virtualenv venv
 source venv/bin/activate
 python3 -m pip install tensorflow-gpu==1.15
@@ -96,7 +96,7 @@ python3 -m pip install Pillow==7.0.0
 ```
 Train:
 ```
-cd ~/tensorflow/models/research/deeplab
+cd ~/formatechnlogies/models/research/deeplab
 source venv/bin/activate
 sh local_test_forma.sh
 CUDA_VISIBLE_DEVICES=0 sh local_test_forma.sh  # train with device=0 only
