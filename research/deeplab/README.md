@@ -7,7 +7,6 @@ cd ~
 mkdir tensorflow
 cd tensorflow
 git clone git@github.com:formatechnologies/models.git
-
 ```
 
 Test to see if the Pascal VOC pretrained model runs:
@@ -44,6 +43,49 @@ If creating a custom dataset:
 1. (Optional) Add this dataset to `Forma54k` in `datasets/build_forma_data.py`
 
 ## Training
+### Pre-Train
+Update `local_test_forma.sh`, ensuring the below are set correctly:
+1. `DATASET_NAME`, `DATASET_EVAL_CROP_SIZE`, and `DATASET_TRAIN_SIZE`
+
+These correspond to the datasets created during dataset generation.
+
+2. `TF_INITIAL_CHECKPOINT_NAME` and `TF_INITIAL_CHECKPOINT`
+
+Make sure your are training from the latest model. (See Post-Train below.)
+
+3. `NUM_CLONES`, `TRAIN_BATCH_SIZE`, and `FINE_TUNE_BATCH_NORM`
+
+The settings in `local_test_forma.sh` are by default for GPU 1 (Qianyi's House):
+```
+ssh -XC dennis@192.168.16.140 #gpu1-workstation
+ssh -XC dennis@192.168.16.150 #gpu2-workstation
+```
+
+If running on a local machine, be sure to change to using only a single GPU in `local_test_forma.sh`:
+```
+# ========================== SETTINGS (WORKSTATION) ==========================
+# # Dennis Workstation Settings
+# export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
+# NUM_CLONES=1
+# TRAIN_BATCH_SIZE=1
+# FINE_TUNE_BATCH_NORM=false
+
+# # GPU 1 + GPU 2 Workstation Settings
+# NUM_CLONES=8
+# # TRAIN_BATCH_SIZE=32
+# TRAIN_BATCH_SIZE=8
+# FINE_TUNE_BATCH_NORM=false
+
+# GPU 1 Workstation Settings (Qianyi's House)
+NUM_CLONES=1
+TRAIN_BATCH_SIZE=1
+FINE_TUNE_BATCH_NORM=false
+```
+
+Please see all DeepLab V3+ Hyperparameters described below, in `local_test_forma.sh`, and in the code
+(`train.py`, `eval.py`, `vis.py`, `export_model.py`) before training.
+
+### Train
 Create and activate a venv for `tensorflow-gpu==1.15`:
 ```
 cd ~/tensorflow/models/research/deeplab
@@ -68,44 +110,40 @@ This will use the `~/storage/shared/deeplab` folder, which contains the followin
 - `~/storage/shared/deeplab/init_models`: stores some pretrained models for initialization
 - `~/storage/shared/deeplab/experiments`: stores all experiment output
 
-The settings in `local_test_forma.sh` are by default for GPU 1 and GPU 2:
+### Post-Train
+1. Update training history found here:
+
+https://docs.google.com/spreadsheets/d/19kLXbGjNFdv_5w-_VDh-6GdO6R-RJBzglAc73SaYcjs/edit?usp=sharing
+
+2. Copy the recently trained model to `init_models`
 ```
-ssh -XC dennis@192.168.16.140 #gpu1-workstation
-ssh -XC dennis@192.168.16.150 #gpu2-workstation
-```
-
-If running on a local machine, be sure to change to using only a single GPU in `local_test_forma.sh`:
-```
-# ========================== SETTINGS (WORKSTATION) ==========================
-
-# Dennis Workstation Settings
-export TF_FORCE_GPU_ALLOW_GROWTH=true   # Workaround cuDNN bug with RTX GPUS
-NUM_CLONES=1
-TRAIN_BATCH_SIZE=1
-FINE_TUNE_BATCH_NORM=false
-
-# GPU 1 + GPU 2 Workstation Settings
-# NUM_CLONES=8
-# TRAIN_BATCH_SIZE=8
-# FINE_TUNE_BATCH_NORM=false
-
-# NUM_CLONES=4  # Don't use 8, draws too much power
-# TRAIN_BATCH_SIZE=16
-# FINE_TUNE_BATCH_NORM=true
+cd ~/storage/shared/deeplab
+export EXP=2020-08-13_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_tryon10k_0.8549_abq-gpu-2_dennis_forma54k_tryon10k_landmarks
+export CKPT=168031
+mkdir init_models/${EXP}
+cp experiments/${EXP}/train/model.ckpt-${CKPT}.meta init_models/${EXP}/model.ckpt-${CKPT}.meta
+cp experiments/${EXP}/train/model.ckpt-${CKPT}.index init_models/${EXP}/model.ckpt-${CKPT}.index
+cp experiments/${EXP}/train/model.ckpt-${CKPT}.data-00000-of-00002 init_models/${EXP}/model.ckpt-${CKPT}.data-00000-of-00002
+cp experiments/${EXP}/train/model.ckpt-${CKPT}.data-00001-of-00002 init_models/${EXP}/model.ckpt-${CKPT}.data-00001-of-00002
+cp experiments/${EXP}/export/frozen_inference_graph.pb init_models/${EXP}/frozen_inference_graph.pb
 ```
 
-Please see all DeepLab V3+ Hyperparameters described below, in `local_test_forma.sh`, and in the code
-(`train.py`, `eval.py`, `vis.py`, `export_model.py`) before training.
+3. Copy the recently trained model to `final_model`
+```
+cp experiments/${EXP}/export/frozen_inference_graph.pb final_model/${EXP}_frozen_inference_graph.pb
+```
+
+4. Copy the recently trained model to `iris` and split into chunks for GitHub upload:
+```
+cp experiments/${EXP}/export/frozen_inference_graph.pb ~/formatechnologies/iris/files/deeplab_model/
+python3 ~/formatechnologies/iris/image_analysis_server/split_model_files.py
+```
 
 # DeepLab V3+ Hyperparameters
 
 See hyperparameters tradeoffs here:
 
 https://arxiv.org/pdf/1706.05587.pdf
-
-See some training history here:
-
-https://docs.google.com/spreadsheets/d/19kLXbGjNFdv_5w-_VDh-6GdO6R-RJBzglAc73SaYcjs/edit?usp=sharing
 
 ## Build Forma Data
 
