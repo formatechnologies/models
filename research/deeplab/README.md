@@ -99,6 +99,7 @@ Train:
 cd ~/tensorflow/models/research/deeplab
 source venv/bin/activate
 sh local_test_forma.sh
+CUDA_VISIBLE_DEVICES=0 sh local_test_forma.sh  # train with device=0 only
 
 source venv/bin/activate
 tensorboard --logdir=~/storage/shared/deeplab/experiments
