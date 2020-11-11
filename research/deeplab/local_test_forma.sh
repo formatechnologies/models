@@ -104,8 +104,8 @@ DATASET_SPLIT="${DATASET_DIR}/dataset_split"
 # FINE_TUNE_BATCH_NORM=false
 
 # GPU 1 Workstation Settings (Qianyi's House)
-NUM_CLONES=1
-TRAIN_BATCH_SIZE=1
+NUM_CLONES=4
+TRAIN_BATCH_SIZE=4
 FINE_TUNE_BATCH_NORM=false
 
 # ========================== SETTINGS (INITIALIZATION) ==========================
