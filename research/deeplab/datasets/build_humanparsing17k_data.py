@@ -210,7 +210,7 @@ def _convert_dataset(dataset_split):
           example = {k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST) for k, v in example.items()}
         seg_dict['seg_sleeves'] = example['seg_sleeves']
         seg_dict['seg_pants'] = example['seg_pants']
-        seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], example['seg_shoes'])  # socks
+        seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], example['seg_shoe'])  # socks
 
         # fashion_dict = decode_segmentation(example['seg_fashion_parsing'], imaterialist_labels_to_numbers)
         # seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
