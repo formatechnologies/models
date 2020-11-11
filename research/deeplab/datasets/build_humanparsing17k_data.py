@@ -85,7 +85,7 @@ HUMAN_PARSING_LABEL_DESCRIPTIONS_FILE = os.path.join(DATASETS_DIR, 'HumanParsing
 HUMAN_PARSING_LANDMARK_DIR = os.path.join(DATASETS_DIR, 'HumanParsingLandmark')  # need permissions
 HUMAN_PARSING_LANDMARK_LANDMARK_DIR = os.path.join(HUMAN_PARSING_LANDMARK_DIR, 'landmark')
 
-DATASET_NAME = 'humanparsing17k_landmarks'
+DATASET_NAME = 'humanparsing17k_landmarks_seg_pants'
 DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/deeplab/datasets')
 DATASET_DIR = os.path.join(DATASETS_DIR, DATASET_NAME)
 DATASET_TFRECORD_DIR = os.path.join(DATASET_DIR, 'tfrecord')
@@ -210,6 +210,7 @@ def _convert_dataset(dataset_split):
           example = {k: cv2.resize(v, (width, height), interpolation=cv2.INTER_NEAREST) for k, v in example.items()}
         seg_dict['seg_sleeves'] = example['seg_sleeves']
         seg_dict['seg_pants'] = example['seg_pants']
+        seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], example['seg_shoes'])  # socks
 
         # fashion_dict = decode_segmentation(example['seg_fashion_parsing'], imaterialist_labels_to_numbers)
         # seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
