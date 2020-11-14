@@ -216,6 +216,26 @@ _IMATERIALIST37K_LANDMARKS_SEG_PANTS_INFORMATION = DatasetDescriptor(
     ignore_label=255,
 )
 
+_HUMANPARSING17K_SEG_PANTS_INFORMATION_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 14164,
+        'trainval': 1771,
+        'val': 1771,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
+_HUMANPARSING17K_IMATERIALIST37K_TRYON10K_LANDMARKS_SEG_PANTS_INFORMATION = DatasetDescriptor(
+    splits_to_sizes={
+        'train': 53770,
+        'trainval': 5472,
+        'val': 5472,
+    },
+    num_classes=9,
+    ignore_label=255,
+)
+
 
 _DATASETS_INFORMATION = {
     'cityscapes': _CITYSCAPES_INFORMATION,
@@ -233,6 +253,8 @@ _DATASETS_INFORMATION = {
     'forma54k_tryon10k': _FORMA54K_TRYON10K_INFORMATION,
     'forma54k_tryon10k_landmarks': _FORMA54K_TRYON10K_LANDMARKS_INFORMATION,
     'imaterialist37k_landmarks_seg_pants': _IMATERIALIST37K_LANDMARKS_SEG_PANTS_INFORMATION,
+    'humanparsing17k_landmarks_seg_pants': _HUMANPARSING17K_SEG_PANTS_INFORMATION_INFORMATION,
+    'humanparsing17k_imaterialist37k_tryon10k_landmarks_seg_pants': _HUMANPARSING17K_IMATERIALIST37K_TRYON10K_LANDMARKS_SEG_PANTS_INFORMATION,
 }
 
 # Default file pattern of TFRecord of TensorFlow Example.

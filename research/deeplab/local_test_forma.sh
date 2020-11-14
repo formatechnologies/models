@@ -82,9 +82,17 @@ EXPERIMENTS_DIR="${DEEPLAB_DIR}/experiments"
 # DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
 # DATASET_TRAIN_SIZE=53770
 
-DATASET_NAME="imaterialist37k_landmarks_seg_pants"
+# DATASET_NAME="imaterialist37k_landmarks_seg_pants"
+# DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=29606
+
+# DATASET_NAME="humanparsing17k_landmarks_seg_pants"
+# DATASET_EVAL_CROP_SIZE="1601,1137" # Max image dimensions + 1
+# DATASET_TRAIN_SIZE=14164
+
+DATASET_NAME="humanparsing17k_imaterialist37k_tryon10k_landmarks_seg_pants"
 DATASET_EVAL_CROP_SIZE="1601,3783" # Max image dimensions + 1
-DATASET_TRAIN_SIZE=29606
+DATASET_TRAIN_SIZE=53770
 
 DATASET_DIR="${DATASETS_DIR}/${DATASET_NAME}"
 DATASET_TFRECORD="${DATASET_DIR}/tfrecord"
