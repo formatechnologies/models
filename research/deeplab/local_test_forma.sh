@@ -123,8 +123,8 @@ FINE_TUNE_BATCH_NORM=false
 # INITIALIZE_LAST_LAYERS=false
 # LAST_LAYERS_CONTAINS_LOGITS_ONLY=true
 
-TF_INITIAL_CHECKPOINT_NAME="forma54k_tryon10k_landmarks_0.8565"
-TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-08-13_num_epochs_25_train_batch_size_8_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_tryon10k_0.8549_abq-gpu-2_dennis_forma54k_tryon10k_landmarks/model.ckpt-168031"
+TF_INITIAL_CHECKPOINT_NAME="imaterialist37k_landmarks_seg_pants_0.8444"
+TF_INITIAL_CHECKPOINT="${INIT_MODELS_DIR}/2020-10-28_num_epochs_25_train_batch_size_4_train_crop_size_1025,1025_tf_initial_checkpoint_forma54k_tryon10k_landmarks_0.8565_abq-gpu-1_dennis_imaterialist37k_landmarks_seg_pants"
 INITIALIZE_LAST_LAYERS=true
 LAST_LAYERS_CONTAINS_LOGITS_ONLY=true # irrelevant
 
