@@ -64,8 +64,8 @@ import numpy as np
 import cv2
 
 from iris.utility.paths import STORAGE_DIR
-from iris.utility.json_tools import load_dict_from_json
-from iris.utility.misc import multi_max
+from iris.utility.json_tools import load_dict_from_json, save_dict_to_json
+from iris.utility.misc import multi_max, get_path_name
 from iris.utility.processing import item_iterator, DictFile
 
 
@@ -254,14 +254,24 @@ def main(unused_argv):
 # if __name__ == '__main__':
 #   tf.compat.v1.app.run()
 
+"""
+Convert imaterialist to json
+"""
 if __name__ == '__main__':
+  DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
+  IMATERIALIST37K_DIR = os.path.join(DATASETS_DIR, 'imaterialist37k')
+  IMATERIALIST37K_METADATA_PATH = os.path.join(DATASETS_DIR, 'imaterialist37k_metadata.json')
+
   paths = sorted(glob.glob(DATA_DIR + '/*.json'))
-  metadata = DictFile('temp.json')
+  metadata = DictFile(IMATERIALIST37K_METADATA_PATH)
 
   def process(path, metadata):
-    # Read the image.
+    path_out = os.path.join(IMATERIALIST37K_DIR, f'{get_path_name(path)}.json')
+    if os.path.exists(path_out):
+      metadata[path] = True
+      return
+
     example = load_dict_from_json(path)
-    image = example['image']
 
     # Read the semantic segmentation annotation.
     fashion_dict = decode_segmentation(example['seg_fashion_parsing'], fashion_names_to_bits)
@@ -273,15 +283,15 @@ if __name__ == '__main__':
     seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], fashion_dict['sock'])
     seg_dict['seg_background'] = get_seg_background(seg_dict)
     seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
-    seg = seg[:, :, np.newaxis].repeat(3, axis=2)
+    # seg = seg[:, :, np.newaxis].repeat(3, axis=2)
 
-    # Read the landmarks data.
-    landmarks = example['pose_landmarks'].astype(np.float32)
+    example_out = {
+      'image': example['image'],
+      'deeplab_segmentation': seg,
+      'pose_landmarks': example['pose_landmarks'],
+    }
+    save_dict_to_json(example_out, path_out)
 
-    metadata[item] = True
-
-    from iris.utility.visualization import dump_dict, plot, overlay_masks, outfit_vis
-    import matplotlib.pyplot as plt; plt.ion()
-    import pdb; pdb.set_trace()
+    metadata[path] = True
 
   item_iterator(paths, process, metadata, workers=1, save_interval=100)
