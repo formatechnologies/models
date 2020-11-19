@@ -66,6 +66,7 @@ import cv2
 from iris.utility.paths import STORAGE_DIR
 from iris.utility.json_tools import load_dict_from_json
 from iris.utility.misc import multi_max
+from iris.utility.processing import item_iterator, DictFile
 
 
 _NUM_PER_SHARD = 500
@@ -250,5 +251,37 @@ def main(unused_argv):
     _convert_dataset(dataset_split)
 
 
+# if __name__ == '__main__':
+#   tf.compat.v1.app.run()
+
 if __name__ == '__main__':
-  tf.compat.v1.app.run()
+  paths = sorted(glob.glob(DATA_DIR + '/*.json'))
+  metadata = DictFile('temp.json')
+
+  def process(path, metadata):
+    # Read the image.
+    example = load_dict_from_json(path)
+    image = example['image']
+
+    # Read the semantic segmentation annotation.
+    fashion_dict = decode_segmentation(example['seg_fashion_parsing'], fashion_names_to_bits)
+    seg_dict = {k: v for k, v in example.items() if k in seg_name_to_label}
+    seg_dict['seg_sleeves'] = fashion_dict['sleeve']
+    seg_dict['seg_pants'] = multi_max([
+      fashion_dict[k] for k in ['pants', 'shorts', 'skirt', 'belt', 'tights, stockings']
+    ])
+    seg_dict['seg_shoe'] = np.maximum(seg_dict['seg_shoe'], fashion_dict['sock'])
+    seg_dict['seg_background'] = get_seg_background(seg_dict)
+    seg = encode_segmentation_exclusive(seg_dict, seg_name_to_label)
+    seg = seg[:, :, np.newaxis].repeat(3, axis=2)
+
+    # Read the landmarks data.
+    landmarks = example['pose_landmarks'].astype(np.float32)
+
+    metadata[item] = True
+
+    from iris.utility.visualization import dump_dict, plot, overlay_masks, outfit_vis
+    import matplotlib.pyplot as plt; plt.ion()
+    import pdb; pdb.set_trace()
+
+  item_iterator(paths, process, metadata, workers=1, save_interval=100)
