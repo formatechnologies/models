@@ -183,3 +183,5 @@ cache_directory/
 
 datasets/pascal_voc_seg
 deeplab_model/frozen_inference_graph.pb
+
+.c9/
