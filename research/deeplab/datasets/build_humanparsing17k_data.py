@@ -339,6 +339,7 @@ if __name__ == '__main__':
 
     # Read the image.
     image = cv2.imread(path)
+    height, width = image.shape[:2]
 
     # Read the semantic segmentation annotation.
     seg_filename = os.path.join(HUMAN_PARSING_LABEL_DIR, f'{image_name}.png')
