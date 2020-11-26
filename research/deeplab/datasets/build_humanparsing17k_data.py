@@ -319,11 +319,15 @@ def main(unused_argv):
 Convert humanparsing17k to json
 """
 if __name__ == '__main__':
+  from iris.utility.processing import DictFile, item_iterator
+  from iris.utility.misc import get_path_name
+  from iris.utility.json_tools import save_dict_to_json
+
   DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
   HUMANPARSING17K_DIR = os.path.join(DATASETS_DIR, 'humanparsing17k')
   HUMANPARSING17K_METADATA_PATH = os.path.join(DATASETS_DIR, 'humanparsing17k_metadata.json')
 
-  paths = sorted(glob.glob(HUMAN_PARSING_IMAGE_DIR))
+  paths = sorted(glob.glob(HUMAN_PARSING_IMAGE_DIR + '/*'))
   metadata = DictFile(HUMANPARSING17K_METADATA_PATH)
 
   def process(path, metadata):
@@ -377,7 +381,8 @@ if __name__ == '__main__':
     landmark_filename = os.path.join(HUMAN_PARSING_LANDMARK_LANDMARK_DIR, f'{image_name}.json')
     info = load_dict_from_json(landmark_filename)
     if info['status'] == 'failure':
-      continue
+      metadata[path] = False
+      return
 
     example_out = {
       'image': image,
