@@ -271,5 +271,51 @@ def main(unused_argv):
         _convert_dataset(dataset_split)
 
 
+# if __name__ == '__main__':
+#     tf.compat.v1.app.run()
+
+
+"""
+Convert tryon10k to json
+"""
 if __name__ == '__main__':
-    tf.compat.v1.app.run()
+  from iris.utility.processing import DictFile, item_iterator
+  from iris.utility.misc import get_path_name
+  from iris.utility.json_tools import save_dict_to_json
+
+  DATASETS_DIR = os.path.join(STORAGE_DIR, 'shared/datasets')
+  TRYON10K_DIR = os.path.join(DATASETS_DIR, 'tryon10k')
+  TRYON10K_METADATA_PATH = os.path.join(DATASETS_DIR, 'tryon10k_metadata.json')
+
+  paths = sorted(glob.glob(DATASET_INPUT_DATA + '/*'))
+  metadata = DictFile(TRYON10K_METADATA_PATH)
+
+  def process(path, metadata):
+    image_name = get_path_name(path)
+    path_out = os.path.join(TRYON10K_DIR, f'{image_name}.json')
+    if os.path.exists(path_out):
+      metadata[path] = True
+      return
+
+    # Read the image.
+    image = cv2.imread(path)
+
+    # Read the semantic segmentation annotation.
+    seg_filename = os.path.join(DATASET_INPUT_LABEL, f'{image_name}.png')
+    seg = cv2.imread(seg_filename)
+
+    # Read the landmarks data.
+    landmark_filename = os.path.join(DATASET_INPUT_LANDMARK, f'{image_name}.json')
+    info = load_dict_from_json(landmark_filename)
+    landmarks = info['pose_landmarks']
+
+    example_out = {
+      'image': image,
+      'deeplab_segmentation': seg,
+      'pose_landmarks': landmarks,
+    }
+    save_dict_to_json(example_out, path_out)
+
+    metadata[path] = True
+
+  item_iterator(paths, process, metadata, workers=1, save_interval=100)
